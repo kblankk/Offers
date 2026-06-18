@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { collectAll } from "@/lib/collector";
 import { closeBrowser } from "@/lib/browser";
+import { isStale } from "@/lib/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,8 +9,16 @@ export const maxDuration = 120;
 
 let running = false;
 
-/** Dispara uma coleta sob demanda (botao "Atualizar agora" na UI). */
-export async function POST() {
+/**
+ * Dispara uma coleta. Sem parametros = coleta sempre (botao "Atualizar agora").
+ * Com ?ifStale=1 = so coleta se os dados estiverem velhos (usado pela auto-coleta).
+ */
+export async function POST(req: Request) {
+  const intervalMin = Number(process.env.COLLECT_INTERVAL_MIN) || 30;
+  const ifStale = new URL(req.url).searchParams.get("ifStale") === "1";
+  if (ifStale && !isStale(intervalMin * 0.8 * 60_000)) {
+    return NextResponse.json({ ok: true, skipped: true });
+  }
   if (running) {
     return NextResponse.json({ error: "Ja existe uma coleta em andamento." }, { status: 409 });
   }

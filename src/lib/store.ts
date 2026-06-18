@@ -115,6 +115,7 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
       usesPeak: peak,
       usesDate: today,
       exclusive: raw.exclusive ?? existing.exclusive,
+      minPurchase: raw.minPurchase ?? existing.minPurchase,
       kind: raw.kind,
       expiresAt: raw.expiresAt ?? existing.expiresAt,
       status: draining ? "suspected_exhausted" : "active",
@@ -145,6 +146,7 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
     usesPeak: uses,
     usesDate: today,
     exclusive: raw.exclusive,
+    minPurchase: raw.minPurchase,
     expiresAt: raw.expiresAt ?? null,
     status: "active",
     confidence,
@@ -248,6 +250,23 @@ export function couponsToVerify(limit = 100): Coupon[] {
     .filter((c) => c.status !== "expired")
     .sort((a, b) => a.lastCheckedAt.localeCompare(b.lastCheckedAt))
     .slice(0, limit);
+}
+
+/** Momento da coleta/verificacao mais recente (ISO) ou null se vazio. */
+export function lastUpdatedAt(): string | null {
+  reloadIfChanged();
+  let max: string | null = null;
+  for (const c of data.values()) {
+    if (!max || c.lastCheckedAt > max) max = c.lastCheckedAt;
+  }
+  return max;
+}
+
+/** True se os dados estao mais velhos que `maxAgeMs` (ou vazios). */
+export function isStale(maxAgeMs: number): boolean {
+  const last = lastUpdatedAt();
+  if (!last) return true;
+  return Date.now() - new Date(last).getTime() > maxAgeMs;
 }
 
 export function stats(): Record<string, number> {

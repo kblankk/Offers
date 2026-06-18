@@ -65,11 +65,18 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
         <StatusBadge status={coupon.status} />
       </div>
 
-      {coupon.discountText && (
-        <p className="mt-4 text-2xl font-extrabold tracking-tight text-brand-600">
-          {coupon.discountText}
-        </p>
-      )}
+      <div className="mt-4 flex items-center gap-2">
+        {coupon.discountText && (
+          <span className="text-2xl font-extrabold tracking-tight text-brand-600">
+            {coupon.discountText}
+          </span>
+        )}
+        {typeof coupon.minPurchase === "number" && (
+          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
+            mín. R${coupon.minPurchase}
+          </span>
+        )}
+      </div>
 
       <h3 className="mt-1 line-clamp-2 text-sm font-medium text-slate-800">{coupon.title}</h3>
 

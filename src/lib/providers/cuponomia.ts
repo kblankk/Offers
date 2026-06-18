@@ -27,6 +27,24 @@ export async function collectFromCuponomia(
       ctx.log.warn(`${store}: nenhum cupom encontrado (layout pode ter mudado).`);
     });
 
+    // Rola a pagina para disparar o lazy-load e captar TODOS os cupons (nao so
+    // os ~45 do primeiro render). Para quando a contagem de cards estabiliza.
+    let prevCount = 0;
+    for (let i = 0; i < 12; i++) {
+      const count = await page.locator("li.item[data-id]").count();
+      if (count === prevCount && i > 1) break;
+      prevCount = count;
+      // tenta clicar em "ver mais", se existir
+      const more = page.getByText(/ver mais|carregar mais|mostrar mais/i).first();
+      if (await more.isVisible().catch(() => false)) {
+        await more.click().catch(() => {});
+      } else {
+        await page.mouse.wheel(0, 6000).catch(() => {});
+      }
+      await page.waitForTimeout(700);
+    }
+    ctx.log.info(`${store}: ${prevCount} cards apos scroll.`);
+
     const raw = await page.$$eval("li.item[data-id]", (items) => {
       const out: {
         id: string;
@@ -66,13 +84,29 @@ export async function collectFromCuponomia(
     const parseVerified = (status: string[]): string | undefined =>
       status.find((s) => /verificad/i.test(s));
 
+    // Valor minimo de compra ("a partir de R$149", "acima de R$69", "compras de R$50").
+    const parseMin = (text: string): number | undefined => {
+      const m = text.match(/(?:a partir de|acima de|compras de|m[ií]nimo de|min\.?)\s*R\$\s*([\d.]+)/i);
+      if (!m) return undefined;
+      const n = Number(m[1]!.replace(/\./g, ""));
+      return Number.isFinite(n) && n > 0 ? n : undefined;
+    };
+
     // Alguns "codigos" sao na verdade placeholders ("Ative o cupom no link"),
     // i.e. nao ha codigo digitavel — o desconto e ativado pelo link (exclusivo).
     const isPlaceholder = (code: string) => /ative|no link|ver cupom|clique|resgat/i.test(code);
 
+    const seen = new Set<string>();
     const coupons: RawCoupon[] = raw
       .map((r) => ({ ...r, code: isPlaceholder(r.code) ? "" : r.code }))
       .filter((r) => r.code || /%|off|cashback|gr[aá]tis/i.test(`${r.discount} ${r.title}`))
+      // Deduplica: mesmo codigo (ou mesmo id, p/ ofertas sem codigo) aparece uma vez so.
+      .filter((r) => {
+        const key = r.code ? `code:${r.code.toUpperCase()}` : `id:${r.id}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
       .map((r) => ({
         store,
         kind: (r.type === "code" && r.code) || r.code ? "code" : "offer",
@@ -85,10 +119,11 @@ export async function collectFromCuponomia(
         verifiedText: parseVerified(r.status),
         usesToday: parseUses(r.status),
         exclusive: r.exclusive,
+        minPurchase: parseMin(`${r.desc} ${r.title}`),
         expiresAt: null,
       }));
 
-    ctx.log.info(`${store}: ${coupons.length} cupons (${raw.length} cards brutos).`);
+    ctx.log.info(`${store}: ${coupons.length} cupons unicos (${raw.length} cards brutos).`);
     return coupons;
   });
 }

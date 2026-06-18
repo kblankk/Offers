@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listCoupons, stats } from "@/lib/store";
+import { listCoupons, stats, lastUpdatedAt } from "@/lib/store";
 import type { CouponStatus, Store } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -21,5 +21,5 @@ export async function GET(req: Request) {
     : undefined;
 
   const coupons = listCoupons({ store, status, search, trustedOnly });
-  return NextResponse.json({ coupons, stats: stats() });
+  return NextResponse.json({ coupons, stats: stats(), updatedAt: lastUpdatedAt() });
 }

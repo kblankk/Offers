@@ -36,6 +36,8 @@ export interface RawCoupon {
   usesToday?: number;
   /** Cupom exclusivo do agregador (so funciona ativando pelo link, nao digitando o codigo). */
   exclusive?: boolean;
+  /** Valor minimo de compra para o cupom valer (R$), quando detectado. */
+  minPurchase?: number;
   /** Data de expiracao, se conhecida (ISO 8601). */
   expiresAt?: string | null;
 }

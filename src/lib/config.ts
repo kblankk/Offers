@@ -15,9 +15,15 @@ const enabled = csv(process.env.ENABLED_STORES).filter((s): s is Store =>
 );
 
 /** Configuracao do app. Sem segredos obrigatorios — o app web funciona out-of-the-box. */
+function intMin(value: string | undefined, fallback: number): number {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
 export const config = {
   enabledStores: enabled.length ? enabled : VALID_STORES,
-  collectCron: process.env.COLLECT_CRON || "*/30 * * * *",
+  /** Intervalo da auto-coleta, em minutos. */
+  collectIntervalMin: intMin(process.env.COLLECT_INTERVAL_MIN, 30),
   headless: (process.env.HEADLESS || "true").toLowerCase() !== "false",
   dbPath: process.env.DB_PATH || "./data/coupons.json",
 } as const;

@@ -11,6 +11,17 @@ type StatusFilter = CouponStatus | "all";
 interface ApiResponse {
   coupons: Coupon[];
   stats: Record<string, number>;
+  updatedAt: string | null;
+}
+
+function timeAgo(iso: string | null): string {
+  if (!iso) return "nunca";
+  const min = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 1) return "agora mesmo";
+  if (min < 60) return `há ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `há ${h} h`;
+  return `há ${Math.floor(h / 24)} d`;
 }
 
 const STATUS_TABS: { key: StatusFilter; label: string }[] = [
@@ -23,6 +34,7 @@ const STATUS_TABS: { key: StatusFilter; label: string }[] = [
 export default function Home() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [stats, setStats] = useState<Record<string, number>>({});
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [collecting, setCollecting] = useState(false);
   const [store, setStore] = useState<StoreFilter>("all");
@@ -43,6 +55,7 @@ export default function Home() {
       const data: ApiResponse = await res.json();
       setCoupons(data.coupons ?? []);
       setStats(data.stats ?? {});
+      setUpdatedAt(data.updatedAt ?? null);
     } finally {
       setLoading(false);
     }
@@ -56,6 +69,12 @@ export default function Home() {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [fetchCoupons, query]);
+
+  // Recarrega sozinho a cada 60s para refletir as coletas automaticas do servidor.
+  useEffect(() => {
+    const id = setInterval(fetchCoupons, 60_000);
+    return () => clearInterval(id);
+  }, [fetchCoupons]);
 
   async function refresh() {
     setCollecting(true);
@@ -82,14 +101,23 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <button
-          onClick={refresh}
-          disabled={collecting}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-60"
-        >
-          <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
-          {collecting ? "Buscando cupons..." : "Atualizar agora"}
-        </button>
+        <div className="flex flex-col items-start gap-1 sm:items-end">
+          <button
+            onClick={refresh}
+            disabled={collecting}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-60"
+          >
+            <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
+            {collecting ? "Buscando cupons..." : "Atualizar agora"}
+          </button>
+          <span className="flex items-center gap-1 text-xs text-slate-400">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            Atualiza sozinho · atualizado {timeAgo(updatedAt)}
+          </span>
+        </div>
       </header>
 
       {/* Stats */}

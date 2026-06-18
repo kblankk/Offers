@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Playwright e modulos nativos do worker nao devem ser empacotados pelo Next.
-  serverExternalPackages: ["playwright"],
+  // Playwright usa binarios externos e nao deve ser empacotado pelo webpack.
+  serverExternalPackages: ["playwright", "playwright-core"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "assets.cuponomia.com.br" },
