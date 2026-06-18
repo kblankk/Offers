@@ -153,11 +153,34 @@ export default function Home() {
               </button>
             </div>
           </div>
+
+          {/* Texto do hero no lado direito (desktop), sobre a imagem */}
+          <div className="absolute inset-y-0 right-0 z-10 hidden w-[50%] items-center md:flex lg:w-[46%]">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[#060b13]/90 via-black/50 to-transparent" />
+            <div className="relative px-8 lg:px-14">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+                Atualização automática · {timeAgo(updatedAt)} · {stats.active ?? 0} cupons ativos
+              </div>
+              <h1 className="display mt-4 text-4xl text-white lg:text-5xl">
+                Economize
+                <br />
+                <span className="neon text-brand-300">de verdade.</span>
+              </h1>
+              <p className="mt-4 max-w-md text-sm text-white/85 lg:text-base">
+                Cupons verificados de Mercado Livre, Amazon e Shopee — com código, desconto e status. Reunidos de
+                agregadores e canais de Telegram, atualizados sozinhos.
+              </p>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Masthead editorial (logo abaixo da imagem) */}
-      <section className="relative mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
+      {/* Masthead editorial — so no mobile (no desktop o texto fica sobre a imagem) */}
+      <section className="relative mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16 md:hidden">
         {/* brilhos decorativos borrados (so no dark) */}
         <div className="pointer-events-none absolute inset-0 -z-10 hidden overflow-visible dark:block">
           <div className="animate-glow absolute -left-24 -top-10 h-72 w-72 rounded-full bg-cyan-500/25 blur-3xl" />
