@@ -1,0 +1,71 @@
+/** Lojas suportadas. */
+export type Store = "mercadolivre" | "amazon" | "shopee";
+
+/**
+ * Status de um cupom.
+ * - active:   confirmado presente na fonte nesta coleta.
+ * - expired:  saiu da lista da fonte (provavelmente acabou) ou passou da validade.
+ * - suspected_exhausted: ainda listado, mas com sinais de esgotamento. Suspeita, nao garantia.
+ * - unknown:  nao foi possivel verificar.
+ */
+export type CouponStatus = "active" | "expired" | "suspected_exhausted" | "unknown";
+
+/** Nivel de confianca da verificacao. */
+export type Confidence = "high" | "medium" | "low";
+
+/** Tipo do cupom: codigo (digita no checkout) ou oferta (desconto direto no link). */
+export type CouponKind = "code" | "offer";
+
+/** Cupom recem-coletado de uma fonte, antes de persistir. */
+export interface RawCoupon {
+  store: Store;
+  kind: CouponKind;
+  /** Codigo do cupom (ex.: "APROVEITAJA") ou null se for oferta sem codigo. */
+  code: string | null;
+  title: string;
+  description?: string;
+  /** URL para usar/ver o cupom. */
+  url: string;
+  /** Desconto exibido (ex.: "10% OFF", "R$ 30"). */
+  discountText?: string;
+  /** Logo da loja / imagem do cupom. */
+  imageUrl?: string;
+  /** Texto de verificacao da fonte (ex.: "Verificado hoje", "Verificado ontem"). */
+  verifiedText?: string;
+  /** Quantas pessoas usaram hoje (sinal de que funciona). */
+  usesToday?: number;
+  /** Cupom exclusivo do agregador (so funciona ativando pelo link, nao digitando o codigo). */
+  exclusive?: boolean;
+  /** Data de expiracao, se conhecida (ISO 8601). */
+  expiresAt?: string | null;
+}
+
+/** Cupom como persistido no banco. */
+export interface Coupon extends RawCoupon {
+  /** Hash estavel derivado de store+code+url. */
+  id: string;
+  status: CouponStatus;
+  confidence: Confidence;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  lastCheckedAt: string;
+  statusReason: string;
+  /** Maior nº de "usados hoje" observado no dia (para detectar queda = esgotando). */
+  usesPeak?: number;
+  /** Data (YYYY-MM-DD) a que `usesPeak`/`usesToday` se referem. */
+  usesDate?: string;
+}
+
+/** Resultado de uma verificacao individual. */
+export interface VerificationResult {
+  status: CouponStatus;
+  confidence: Confidence;
+  reason: string;
+  expiresAt?: string | null;
+}
+
+export const STORE_META: Record<Store, { label: string; color: string }> = {
+  mercadolivre: { label: "Mercado Livre", color: "#FFE600" },
+  amazon: { label: "Amazon", color: "#FF9900" },
+  shopee: { label: "Shopee", color: "#EE4D2D" },
+};

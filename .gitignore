@@ -1,0 +1,23 @@
+# Dependencias
+node_modules/
+
+# Build do Next.js
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Banco de dados local e segredos
+data/
+*.sqlite
+*.sqlite-*
+.env
+.env.local
+
+# Logs
+*.log
+
+# Playwright
+/test-results/
+/playwright-report/
