@@ -85,3 +85,28 @@ export function detectCategories(text: string): string[] {
   const t = normalizeText(text).replace(STORE_WORDS, " ");
   return CATEGORIES.filter((c) => c.re.test(t)).map((c) => c.label);
 }
+
+/**
+ * Pistas de categoria escondidas no CODIGO do cupom (ex.: "MELIMODA18",
+ * "INTERNACIONAL15", "LOREALMELI"). Como o codigo e concatenado e sem espacos,
+ * o detector normal (que exige limite de palavra) nao pega. Aqui usamos
+ * substring, com tokens DISTINTIVOS de campanhas restritas para evitar falso
+ * positivo. Nao incluimos Eletronicos (raramente e a restricao e geraria ruido).
+ */
+const CODE_HINTS: { label: string; re: RegExp }[] = [
+  { label: "Produtos internacionais", re: /internacion|importad/ },
+  { label: "Moda", re: /moda|fashion|vestuario|calcad|tenis/ },
+  { label: "Beleza", re: /beleza|perfum|cosmetic|maquiag|skincare|loreal|natura|avonn?|cabelo/ },
+  { label: "Casa", re: /cozinha|eletrodom|decora|movei/ },
+  { label: "Pet", re: /petshop|petlover|petamor/ },
+  { label: "Bebês/Infantil", re: /infantil|brinquedo/ },
+  { label: "Esporte", re: /esporte|fitness|academia/ },
+  { label: "Farmácia/Saúde", re: /farmacia|drogaria|suplement|creatina/ },
+  { label: "Livros", re: /\blivros?\b|\bbooks?\b/ },
+];
+
+export function categoryHintsFromCode(code?: string | null): string[] {
+  if (!code) return [];
+  const t = normalizeText(code);
+  return CODE_HINTS.filter((c) => c.re.test(t)).map((c) => c.label);
+}

@@ -9,6 +9,7 @@ import { STORE_META, type Coupon, type Store } from "@/lib/types";
 type FitLevel = "yes" | "maybe" | "no";
 interface Fit {
   level: FitLevel;
+  score: number;
   note: string;
 }
 type MatchedCoupon = Coupon & { fit: Fit };
