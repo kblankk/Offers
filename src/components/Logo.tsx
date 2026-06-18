@@ -1,35 +1,33 @@
 /**
- * Wordmark "allcupom" onde o "o" e uma etiqueta de preco (price tag) magenta,
- * no estilo aprovado pelo usuario. SVG => escala nitida em qualquer tamanho.
+ * Wordmark "allcupom" onde o "o" e um ICONE DE ETIQUETA DE CUPOM (price tag)
+ * em ciano neon com brilho — no estilo aprovado pelo usuario.
+ * SVG => escala nitida em qualquer tamanho.
  */
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <span className={`display inline-flex select-none items-center text-2xl tracking-tight ${className}`}>
       <span className="text-zinc-900 dark:text-white">allcup</span>
-      <span className="relative mx-[0.015em] inline-block h-[0.74em] w-[0.74em] translate-y-[0.05em]">
+      <span className="relative mx-[0.02em] inline-block h-[0.82em] w-[0.92em] translate-y-[0.04em]">
         <svg
-          viewBox="0 0 24 24"
+          viewBox="0 0 26 22"
           fill="none"
-          className="h-full w-full drop-shadow-[0_0_7px_rgba(217,70,239,0.75)]"
+          className="h-full w-full drop-shadow-[0_0_6px_rgba(34,211,238,0.85)]"
           aria-hidden="true"
         >
-          <rect
-            x="3.4"
-            y="3.4"
-            width="17.2"
-            height="17.2"
-            rx="5.6"
-            transform="rotate(12 12 12)"
-            fill="url(#logo-tag)"
+          {/* corpo da etiqueta apontando para a direita */}
+          <path
+            d="M2.4 5.2C2.4 3.7 3.6 2.5 5.1 2.5H13.2C13.9 2.5 14.6 2.8 15.1 3.3L23 11L15.1 18.7C14.6 19.2 13.9 19.5 13.2 19.5H5.1C3.6 19.5 2.4 18.3 2.4 16.8V5.2Z"
+            fill="url(#tag-fill)"
+            stroke="#a5f3fc"
+            strokeWidth="1.4"
+            strokeLinejoin="round"
           />
           {/* furo da etiqueta */}
-          <circle cx="9" cy="9" r="2.05" fill="#0a0f1a" />
-          {/* brilho */}
-          <path d="M6.5 14.5 14.5 6.5" stroke="rgba(255,255,255,0.45)" strokeWidth="1.1" strokeLinecap="round" />
+          <circle cx="7.2" cy="11" r="1.9" fill="#06121c" stroke="#a5f3fc" strokeWidth="1.1" />
           <defs>
-            <linearGradient id="logo-tag" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#f5a8ff" />
-              <stop offset="1" stopColor="#d019e8" />
+            <linearGradient id="tag-fill" x1="3" y1="3" x2="22" y2="19" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#22d3ee" />
+              <stop offset="1" stopColor="#0891b2" />
             </linearGradient>
           </defs>
         </svg>

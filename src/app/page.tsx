@@ -114,18 +114,26 @@ export default function Home() {
 
   return (
     <>
-      {/* Barra superior */}
-      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur-xl dark:border-cyan-400/10 dark:bg-[#060b13]/70">
-        <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+      {/* Header em banner (imagem de referencia, ja traz o wordmark "allcupom") */}
+      <header className="relative w-full overflow-hidden">
+        {/* imagem de fundo */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/header.jpg')" }}
+        />
+        {/* scrims: topo para a nav ficar legivel, base para fundir com a pagina */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/10 to-[#060b13]" />
+
+        {/* barra de navegacao sobre a imagem */}
+        <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
           <Logo />
 
-          {/* Navegacao central */}
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
             {NAV.map((n) => (
               <a
                 key={n.href}
                 href={n.href}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-white/5 dark:hover:text-white"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-white/80 drop-shadow transition hover:bg-white/10 hover:text-white"
               >
                 {n.label}
               </a>
@@ -144,6 +152,9 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* corpo do banner: altura para a textura aparecer */}
+        <div className="relative h-28 sm:h-36" />
       </header>
 
       {/* Masthead editorial */}
