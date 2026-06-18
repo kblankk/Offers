@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Search, RefreshCw, Ticket, ShieldCheck, X, Radar } from "lucide-react";
+import { Search, RefreshCw, Radar, ShieldCheck, X, Inbox } from "lucide-react";
 import { CouponCard } from "@/components/CouponCard";
 import { ProductChecker } from "@/components/ProductChecker";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -17,7 +17,7 @@ interface ApiResponse {
 }
 
 function timeAgo(iso: string | null): string {
-  if (!iso) return "nunca";
+  if (!iso) return "—";
   const min = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
   if (min < 1) return "agora mesmo";
   if (min < 60) return `há ${min} min`;
@@ -87,20 +87,16 @@ export default function Home() {
 
   return (
     <>
-      {/* NAV fixa com glass */}
-      <nav className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/50">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      {/* Barra superior */}
+      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2.5">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-fuchsia-500 text-white shadow-lg shadow-brand-500/30">
-              <Radar className="h-5 w-5" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
+              <Radar className="h-[18px] w-[18px]" />
             </div>
             <div className="leading-tight">
-              <p className="font-display text-base font-bold tracking-tight text-slate-900 dark:text-white">
-                Cupom Radar
-              </p>
-              <p className="hidden text-xs text-slate-500 dark:text-slate-400 sm:block">
-                cupons verificados · ML · Amazon · Shopee
-              </p>
+              <p className="text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white">Cupom Radar</p>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Mercado Livre · Amazon · Shopee</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -108,156 +104,137 @@ export default function Home() {
             <button
               onClick={refresh}
               disabled={collecting}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-fuchsia-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:opacity-90 disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-60"
             >
               <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">{collecting ? "Buscando..." : "Atualizar agora"}</span>
+              <span className="hidden sm:inline">Atualizar</span>
             </button>
           </div>
         </div>
-      </nav>
+      </header>
 
-      <main className="mx-auto max-w-7xl px-4 pb-24 pt-10 sm:px-6 lg:px-8">
-        {/* HERO */}
-        <header className="text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/60 px-3 py-1 text-xs font-medium text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+      <main className="mx-auto max-w-6xl px-4 pb-20 pt-8 sm:px-6">
+        {/* Intro */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
+              Cupons verificados
+            </h1>
+            <p className="mt-1 max-w-xl text-sm text-zinc-500 dark:text-zinc-400">
+              Reunimos cupons de agregadores e canais de Telegram, com status e condições de cada um.
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
-            Atualiza sozinho · {timeAgo(updatedAt)}
-          </span>
-          <h1 className="mt-4 font-display text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-            Os melhores <span className="text-gradient">cupons</span>, verificados.
-          </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-slate-500 dark:text-slate-400">
-            Varremos agregadores e canais de Telegram em tempo quase real para te trazer cupons que
-            realmente funcionam — com código, desconto e onde valem.
-          </p>
-        </header>
-
-        {/* Checador de produto */}
-        <div className="mt-8">
-          <ProductChecker />
+            Atualização automática · {timeAgo(updatedAt)}
+          </div>
         </div>
 
         {/* Stats */}
-        <section className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard label="Total" value={stats.total ?? 0} tone="slate" />
-          <StatCard label="Ativos" value={stats.active ?? 0} tone="emerald" />
-          <StatCard label="Suspeitos" value={stats.suspected_exhausted ?? 0} tone="amber" />
-          <StatCard label="Expirados" value={stats.expired ?? 0} tone="rose" />
-        </section>
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Stat label="Total" value={stats.total ?? 0} />
+          <Stat label="Ativos" value={stats.active ?? 0} accent="text-emerald-600 dark:text-emerald-400" />
+          <Stat label="Suspeitos" value={stats.suspected_exhausted ?? 0} accent="text-amber-600 dark:text-amber-400" />
+          <Stat label="Expirados" value={stats.expired ?? 0} accent="text-rose-600 dark:text-rose-400" />
+        </div>
 
-        {/* Busca + filtros */}
-        <section className="mt-8 flex flex-col gap-4">
+        {/* Checador de produto */}
+        <div className="mt-6">
+          <ProductChecker />
+        </div>
+
+        {/* Toolbar */}
+        <div className="mt-8 flex flex-col gap-3">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-zinc-400" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar por loja, código, desconto..."
-              className="w-full rounded-2xl border border-slate-200 bg-white/80 py-3.5 pl-12 pr-10 text-sm shadow-sm outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15 dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:placeholder:text-slate-500"
+              placeholder="Buscar por loja, código ou desconto"
+              className="w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-9 text-sm outline-none transition placeholder:text-zinc-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500"
             />
             {query && (
               <button
                 onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
               >
-                <X className="h-5 w-5" />
+                <X className="h-[18px] w-[18px]" />
               </button>
             )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <FilterChip active={store === "all"} onClick={() => setStore("all")}>
+            <Chip active={store === "all"} onClick={() => setStore("all")}>
               Todas as lojas
-            </FilterChip>
+            </Chip>
             {(Object.keys(STORE_META) as Store[]).map((s) => (
-              <FilterChip key={s} active={store === s} onClick={() => setStore(s)} dot={STORE_META[s].color}>
+              <Chip key={s} active={store === s} onClick={() => setStore(s)} dot={STORE_META[s].color}>
                 {STORE_META[s].label}
-              </FilterChip>
+              </Chip>
             ))}
-
-            <span className="mx-1 hidden h-5 w-px bg-slate-200 dark:bg-white/10 sm:block" />
-
+            <span className="mx-1 hidden h-5 w-px bg-zinc-200 dark:bg-zinc-800 sm:block" />
             {STATUS_TABS.map((t) => (
-              <FilterChip key={t.key} active={status === t.key} onClick={() => setStatus(t.key)}>
+              <Chip key={t.key} active={status === t.key} onClick={() => setStatus(t.key)}>
                 {t.label}
-              </FilterChip>
+              </Chip>
             ))}
-
-            <span className="mx-1 hidden h-5 w-px bg-slate-200 dark:bg-white/10 sm:block" />
-
+            <span className="mx-1 hidden h-5 w-px bg-zinc-200 dark:bg-zinc-800 sm:block" />
             <button
               onClick={() => setTrusted((v) => !v)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
                 trusted
-                  ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30"
-                  : "bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10 dark:hover:bg-white/10"
+                  ? "bg-emerald-600 text-white"
+                  : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
               }`}
             >
               <ShieldCheck className="h-4 w-4" />
               Só confiáveis
             </button>
           </div>
-        </section>
+        </div>
 
-        {/* Aviso honesto */}
-        <p className="mt-5 flex items-start gap-2 rounded-xl border border-brand-100 bg-brand-50/70 px-4 py-3 text-xs text-brand-700 dark:border-brand-400/15 dark:bg-brand-500/10 dark:text-brand-200">
-          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>
-            Ordenamos pelos mais confiáveis. Cupons <strong>“Exclusivo”</strong> só funcionam pelo link.
-            <strong> “Pode ter restrições”</strong> = a fonte não confirmou onde vale — a garantia de 100%
-            é sempre no checkout, respeitando as condições.
-          </span>
+        {/* Nota de confianca */}
+        <p className="mt-4 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+          Mostramos os mais confiáveis primeiro. Cupons <strong className="font-medium text-zinc-600 dark:text-zinc-300">Exclusivos</strong> funcionam pelo link;{" "}
+          <strong className="font-medium text-zinc-600 dark:text-zinc-300">“Pode ter restrições”</strong> significa que a fonte não confirmou onde valem. A confirmação final é sempre no checkout.
         </p>
 
         {/* Grade */}
-        <section className="mt-6">
+        <div className="mt-5">
           {loading ? (
             <SkeletonGrid />
           ) : coupons.length === 0 ? (
             <EmptyState onRefresh={refresh} collecting={collecting} />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {coupons.map((c, i) => (
-                <div key={c.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {coupons.map((c) => (
+                <div key={c.id} className="animate-fade-in">
                   <CouponCard coupon={c} />
                 </div>
               ))}
             </div>
           )}
-        </section>
+        </div>
       </main>
     </>
   );
 }
 
-function StatCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone: "slate" | "emerald" | "amber" | "rose";
-}) {
-  const tones = {
-    slate: "text-slate-900 dark:text-white",
-    emerald: "text-emerald-600 dark:text-emerald-400",
-    amber: "text-amber-600 dark:text-amber-400",
-    rose: "text-rose-600 dark:text-rose-400",
-  };
+function Stat({ label, value, accent }: { label: string; value: number; accent?: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white/70 p-4 text-center shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5">
-      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</p>
-      <p className={`mt-1 font-display text-2xl font-bold ${tones[tone]}`}>{value}</p>
+    <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+      <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</p>
+      <p className={`mt-0.5 text-2xl font-semibold tracking-tight ${accent ?? "text-zinc-900 dark:text-white"}`}>
+        {value}
+      </p>
     </div>
   );
 }
 
-function FilterChip({
+function Chip({
   active,
   onClick,
   children,
@@ -271,10 +248,10 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
         active
-          ? "bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900"
-          : "bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10 dark:hover:bg-white/10"
+          ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+          : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
       }`}
     >
       {dot && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />}
@@ -285,11 +262,11 @@ function FilterChip({
 
 function SkeletonGrid() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {Array.from({ length: 8 }).map((_, i) => (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="h-60 animate-pulse rounded-2xl border border-slate-200 bg-white/60 dark:border-white/10 dark:bg-white/5"
+          className="h-56 animate-pulse rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
         />
       ))}
     </div>
@@ -298,19 +275,19 @@ function SkeletonGrid() {
 
 function EmptyState({ onRefresh, collecting }: { onRefresh: () => void; collecting: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white/50 py-16 text-center dark:border-white/10 dark:bg-white/5">
-      <Ticket className="h-10 w-10 text-slate-300 dark:text-slate-600" />
-      <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-200">Nenhum cupom para este filtro</p>
-      <p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-        Tente outro filtro ou clique para buscar os cupons mais recentes.
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 py-16 text-center dark:border-zinc-700">
+      <Inbox className="h-9 w-9 text-zinc-300 dark:text-zinc-600" />
+      <p className="mt-3 text-sm font-medium text-zinc-700 dark:text-zinc-200">Nenhum cupom para este filtro</p>
+      <p className="mt-1 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
+        Tente outro filtro ou atualize para buscar os mais recentes.
       </p>
       <button
         onClick={onRefresh}
         disabled={collecting}
-        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
+        className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-60"
       >
         <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
-        Buscar cupons
+        Atualizar
       </button>
     </div>
   );

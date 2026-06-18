@@ -4,22 +4,22 @@ import type { CouponStatus } from "@/lib/types";
 const MAP: Record<CouponStatus, { label: string; cls: string; Icon: typeof CheckCircle2 }> = {
   active: {
     label: "Ativo",
-    cls: "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-400/20",
+    cls: "text-emerald-700 bg-emerald-50 ring-emerald-600/15 dark:text-emerald-400 dark:bg-emerald-500/10 dark:ring-emerald-400/20",
     Icon: CheckCircle2,
   },
   expired: {
     label: "Expirado",
-    cls: "bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/20",
+    cls: "text-rose-700 bg-rose-50 ring-rose-600/15 dark:text-rose-400 dark:bg-rose-500/10 dark:ring-rose-400/20",
     Icon: XCircle,
   },
   suspected_exhausted: {
     label: "Pode ter esgotado",
-    cls: "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-400/20",
+    cls: "text-amber-700 bg-amber-50 ring-amber-600/15 dark:text-amber-400 dark:bg-amber-500/10 dark:ring-amber-400/20",
     Icon: AlertTriangle,
   },
   unknown: {
-    label: "Nao verificado",
-    cls: "bg-slate-100 text-slate-600 ring-slate-500/20 dark:bg-slate-500/10 dark:text-slate-300 dark:ring-slate-400/20",
+    label: "Não verificado",
+    cls: "text-zinc-600 bg-zinc-100 ring-zinc-500/15 dark:text-zinc-400 dark:bg-zinc-800 dark:ring-zinc-400/15",
     Icon: HelpCircle,
   },
 };
@@ -28,7 +28,7 @@ export function StatusBadge({ status }: { status: CouponStatus }) {
   const { label, cls, Icon } = MAP[status];
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${cls}`}
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${cls}`}
     >
       <Icon className="h-3.5 w-3.5" />
       {label}

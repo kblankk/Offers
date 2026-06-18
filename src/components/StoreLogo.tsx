@@ -1,20 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
 import { STORE_META, type Store } from "@/lib/types";
 
-/** Logo da loja: usa a imagem da fonte quando disponivel, com fallback colorido. */
-export function StoreLogo({ store, src, size = 44 }: { store: Store; src?: string; size?: number }) {
+/** Logo da loja: imagem da fonte quando ha, com fallback colorido sobrio. */
+export function StoreLogo({ store, src, size = 38 }: { store: Store; src?: string; size?: number }) {
   const meta = STORE_META[store];
   return (
     <div
-      className="flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white ring-1 ring-slate-200 dark:bg-white/90 dark:ring-white/10"
+      className="flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-zinc-200 dark:ring-zinc-700"
       style={{ width: size, height: size }}
       title={meta.label}
     >
       {src ? (
-        <img src={src} alt={meta.label} width={size} height={size} className="h-full w-full object-contain p-1.5" />
+        <img src={src} alt="" width={size} height={size} className="h-full w-full object-contain p-1" />
       ) : (
         <span
-          className="flex h-full w-full items-center justify-center text-lg font-bold text-slate-700"
+          className="flex h-full w-full items-center justify-center text-sm font-bold text-zinc-700"
           style={{ backgroundColor: meta.color + "22" }}
         >
           {meta.label.charAt(0)}
