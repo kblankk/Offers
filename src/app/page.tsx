@@ -36,6 +36,13 @@ const STATUS_TABS: { key: StatusFilter; label: string }[] = [
   { key: "expired", label: "Expirados" },
 ];
 
+// Navegacao central do header (ancoras para secoes reais da pagina).
+const NAV: { href: string; label: string }[] = [
+  { href: "#destaque", label: "Destaque" },
+  { href: "#cupons", label: "Cupons" },
+  { href: "#verificar", label: "Verificar anúncio" },
+];
+
 export default function Home() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [highlights, setHighlights] = useState<Coupon[]>([]);
@@ -109,15 +116,28 @@ export default function Home() {
     <>
       {/* Barra superior */}
       <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur-xl dark:border-cyan-400/10 dark:bg-[#060b13]/70">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Logo />
+
+          {/* Navegacao central */}
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
+            {NAV.map((n) => (
+              <a
+                key={n.href}
+                href={n.href}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-white/5 dark:hover:text-white"
+              >
+                {n.label}
+              </a>
+            ))}
+          </nav>
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
               onClick={refresh}
               disabled={collecting}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white shadow-[0_0_18px_-4px_rgba(34,211,238,0.7)] transition hover:bg-brand-700 disabled:opacity-60"
             >
               <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">Atualizar</span>
@@ -156,7 +176,7 @@ export default function Home() {
 
       {/* Destaque */}
       {featured && (
-        <section className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
+        <section id="destaque" className="mx-auto mt-10 max-w-6xl scroll-mt-24 px-4 sm:px-6">
           <FeaturedCoupon coupon={featured} />
         </section>
       )}
@@ -168,12 +188,12 @@ export default function Home() {
 
       <main className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
         {/* Checador */}
-        <div className="mt-10">
+        <div id="verificar" className="mt-10 scroll-mt-24">
           <ProductChecker />
         </div>
 
         {/* Toolbar */}
-        <div className="mt-12 flex items-end justify-between gap-4">
+        <div id="cupons" className="mt-12 flex scroll-mt-24 items-end justify-between gap-4">
           <h2 className="display text-2xl text-zinc-900 dark:text-white sm:text-3xl">Todos os cupons</h2>
           <div className="hidden gap-4 text-right sm:flex">
             <Stat label="Ativos" value={stats.active ?? 0} accent="text-emerald-600 dark:text-emerald-400" />
