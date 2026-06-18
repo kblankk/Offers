@@ -28,6 +28,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       ? { Icon: Users, text: `${coupon.usesToday.toLocaleString("pt-BR")} usaram hoje`, cls: "text-zinc-500 dark:text-zinc-400" }
       : null;
 
+  const isNew = Date.now() - new Date(coupon.firstSeenAt).getTime() < 24 * 60 * 60 * 1000;
   const scopeUncertain = !coupon.scopeGeneral && /restri|checkout/i.test(coupon.scope ?? "");
   const scopeCls = coupon.scopeGeneral
     ? "text-emerald-600 dark:text-emerald-400"
@@ -62,7 +63,14 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
               </span>
             )}
           </div>
-          <StatusBadge status={coupon.status} />
+          <div className="flex shrink-0 items-center gap-1.5">
+            {isNew && !isExpired && (
+              <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                Novo
+              </span>
+            )}
+            <StatusBadge status={coupon.status} />
+          </div>
         </div>
 
         <div className="mt-4 flex items-baseline gap-2">

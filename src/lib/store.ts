@@ -264,8 +264,11 @@ export function listCoupons(filter: ListFilter = {}): Coupon[] {
     c.status === "active" ? 0 : c.status === "suspected_exhausted" ? 1 : c.status === "unknown" ? 2 : 3;
   const confRank = (c: Coupon) => (c.confidence === "high" ? 0 : c.confidence === "medium" ? 1 : 2);
   items.sort((a, b) => {
+    // 1) ativos primeiro; 2) com certeza de funcionamento (alta confianca);
+    // 3) NOVOS primeiro (descobertos mais recentemente); 4) mais usados; 5) visto recente.
     if (statusRank(a) !== statusRank(b)) return statusRank(a) - statusRank(b);
     if (confRank(a) !== confRank(b)) return confRank(a) - confRank(b);
+    if (a.firstSeenAt !== b.firstSeenAt) return b.firstSeenAt.localeCompare(a.firstSeenAt);
     if ((b.usesToday ?? 0) !== (a.usesToday ?? 0)) return (b.usesToday ?? 0) - (a.usesToday ?? 0);
     return b.lastSeenAt.localeCompare(a.lastSeenAt);
   });
