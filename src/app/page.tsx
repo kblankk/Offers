@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Search, RefreshCw, Radar, ShieldCheck, X, Inbox } from "lucide-react";
+import { Search, RefreshCw, X, Inbox, ShieldCheck } from "lucide-react";
 import { CouponCard } from "@/components/CouponCard";
 import { ProductChecker } from "@/components/ProductChecker";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { CodeTicker } from "@/components/CodeTicker";
+import { FeaturedCoupon } from "@/components/FeaturedCoupon";
 import { STORE_META, type Coupon, type CouponStatus, type Store } from "@/lib/types";
 
 type StoreFilter = Store | "all";
@@ -35,6 +37,7 @@ const STATUS_TABS: { key: StatusFilter; label: string }[] = [
 
 export default function Home() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [highlights, setHighlights] = useState<Coupon[]>([]);
   const [stats, setStats] = useState<Record<string, number>>({});
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,6 +65,16 @@ export default function Home() {
     }
   }, [store, status, query, trusted]);
 
+  const fetchHighlights = useCallback(async () => {
+    try {
+      const res = await fetch("/api/coupons?status=active&trusted=1");
+      const data: ApiResponse = await res.json();
+      setHighlights(data.coupons ?? []);
+    } catch {
+      /* ignora */
+    }
+  }, []);
+
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(fetchCoupons, query ? 350 : 0);
@@ -71,33 +84,34 @@ export default function Home() {
   }, [fetchCoupons, query]);
 
   useEffect(() => {
-    const id = setInterval(fetchCoupons, 60_000);
+    fetchHighlights();
+    const id = setInterval(() => {
+      fetchCoupons();
+      fetchHighlights();
+    }, 60_000);
     return () => clearInterval(id);
-  }, [fetchCoupons]);
+  }, [fetchCoupons, fetchHighlights]);
 
   async function refresh() {
     setCollecting(true);
     try {
       await fetch("/api/collect", { method: "POST" });
-      await fetchCoupons();
+      await Promise.all([fetchCoupons(), fetchHighlights()]);
     } finally {
       setCollecting(false);
     }
   }
 
+  const featured = highlights.find((c) => c.code) ?? highlights[0];
+
   return (
     <>
       {/* Barra superior */}
-      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
+      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur dark:border-zinc-800 dark:bg-[#08090c]/85">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <Radar className="h-[18px] w-[18px]" />
-            </div>
-            <div className="leading-tight">
-              <p className="text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white">Cupom Radar</p>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Mercado Livre · Amazon · Shopee</p>
-            </div>
+          <div className="flex items-baseline gap-2">
+            <span className="display text-lg text-zinc-900 dark:text-white">CUPOM RADAR</span>
+            <span className="h-2 w-2 rounded-full bg-brand-500" />
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
@@ -113,41 +127,55 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 pb-20 pt-8 sm:px-6">
-        {/* Intro */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
-              Cupons verificados
-            </h1>
-            <p className="mt-1 max-w-xl text-sm text-zinc-500 dark:text-zinc-400">
-              Reunimos cupons de agregadores e canais de Telegram, com status e condições de cada um.
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            Atualização automática · {timeAgo(updatedAt)}
-          </div>
+      {/* Masthead editorial */}
+      <section className="mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
+        <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          </span>
+          Atualização automática · {timeAgo(updatedAt)} · {stats.active ?? 0} cupons ativos
         </div>
+        <h1 className="display mt-4 text-5xl text-zinc-900 dark:text-white sm:text-7xl">
+          Economize
+          <br />
+          <span className="text-brand-600 dark:text-brand-500">de verdade.</span>
+        </h1>
+        <p className="mt-5 max-w-xl text-base text-zinc-600 dark:text-zinc-400">
+          Cupons verificados de Mercado Livre, Amazon e Shopee — com código, desconto e status. Reunidos de
+          agregadores e canais de Telegram, atualizados sozinhos.
+        </p>
+      </section>
 
-        {/* Stats */}
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label="Total" value={stats.total ?? 0} />
-          <Stat label="Ativos" value={stats.active ?? 0} accent="text-emerald-600 dark:text-emerald-400" />
-          <Stat label="Suspeitos" value={stats.suspected_exhausted ?? 0} accent="text-amber-600 dark:text-amber-400" />
-          <Stat label="Expirados" value={stats.expired ?? 0} accent="text-rose-600 dark:text-rose-400" />
-        </div>
+      {/* Destaque */}
+      {featured && (
+        <section className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
+          <FeaturedCoupon coupon={featured} />
+        </section>
+      )}
 
-        {/* Checador de produto */}
-        <div className="mt-6">
+      {/* Ticker de codigos */}
+      <div className="mt-8">
+        <CodeTicker coupons={highlights} />
+      </div>
+
+      <main className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+        {/* Checador */}
+        <div className="mt-10">
           <ProductChecker />
         </div>
 
         {/* Toolbar */}
-        <div className="mt-8 flex flex-col gap-3">
+        <div className="mt-12 flex items-end justify-between gap-4">
+          <h2 className="display text-2xl text-zinc-900 dark:text-white sm:text-3xl">Todos os cupons</h2>
+          <div className="hidden gap-4 text-right sm:flex">
+            <Stat label="Ativos" value={stats.active ?? 0} accent="text-emerald-600 dark:text-emerald-400" />
+            <Stat label="Suspeitos" value={stats.suspected_exhausted ?? 0} accent="text-amber-600 dark:text-amber-400" />
+            <Stat label="Expirados" value={stats.expired ?? 0} accent="text-rose-600 dark:text-rose-400" />
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-3">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-zinc-400" />
             <input
@@ -196,13 +224,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Nota de confianca */}
         <p className="mt-4 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-          Mostramos os mais confiáveis primeiro. Cupons <strong className="font-medium text-zinc-600 dark:text-zinc-300">Exclusivos</strong> funcionam pelo link;{" "}
-          <strong className="font-medium text-zinc-600 dark:text-zinc-300">“Pode ter restrições”</strong> significa que a fonte não confirmou onde valem. A confirmação final é sempre no checkout.
+          Mostramos os mais confiáveis primeiro. Cupons{" "}
+          <strong className="font-medium text-zinc-600 dark:text-zinc-300">Exclusivos</strong> funcionam pelo link;{" "}
+          <strong className="font-medium text-zinc-600 dark:text-zinc-300">“Pode ter restrições”</strong> = a fonte não
+          confirmou onde valem. A confirmação final é sempre no checkout.
         </p>
 
-        {/* Grade */}
         <div className="mt-5">
           {loading ? (
             <SkeletonGrid />
@@ -225,11 +253,9 @@ export default function Home() {
 
 function Stat({ label, value, accent }: { label: string; value: number; accent?: string }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-      <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</p>
-      <p className={`mt-0.5 text-2xl font-semibold tracking-tight ${accent ?? "text-zinc-900 dark:text-white"}`}>
-        {value}
-      </p>
+    <div>
+      <p className={`display text-2xl ${accent ?? "text-zinc-900 dark:text-white"}`}>{value}</p>
+      <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">{label}</p>
     </div>
   );
 }
