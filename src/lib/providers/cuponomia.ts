@@ -130,14 +130,17 @@ export async function collectFromCuponomia(
       if (cats.length) parts.push(...cats);
       else if (storeWide) parts.push("Site todo");
       else if (selected) parts.push("Itens selecionados");
-      else parts.push("Geral");
+      // Sem categoria e sem confirmacao de site-todo: NAO afirmamos "Geral"
+      // (a fonte costuma omitir restricoes que existem na loja). Avisamos.
+      else parts.push("Pode ter restrições — ver no checkout");
 
       if (selected && cats.length) parts.push("selecionados");
       if (firstBuy) parts.push("1ª compra");
       if (inApp) parts.push("no app");
       if (freeShip) parts.push("frete grátis");
 
-      const general = cats.length === 0 && !selected && !firstBuy && (storeWide || parts[0] === "Geral");
+      // So afirmamos "geral/site todo" quando a fonte confirma explicitamente.
+      const general = storeWide && cats.length === 0 && !selected && !firstBuy;
       return { scope: parts.join(" · "), general };
     };
 
