@@ -155,9 +155,9 @@ export default function Home() {
           </div>
 
           {/* Texto do hero no lado direito (desktop), sobre a imagem */}
-          <div className="absolute inset-y-0 right-0 z-10 hidden w-[50%] items-center md:flex lg:w-[46%]">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[#060b13]/90 via-black/50 to-transparent" />
-            <div className="relative px-8 lg:px-14">
+          <div className="absolute inset-y-0 right-0 z-10 hidden w-[50%] items-end md:flex lg:w-[46%]">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[#060b13]/90 via-black/45 to-transparent" />
+            <div className="relative px-8 pb-12 lg:px-14 lg:pb-16">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
