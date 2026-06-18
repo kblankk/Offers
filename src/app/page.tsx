@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Search, RefreshCw, X, Inbox, ShieldCheck } from "lucide-react";
+import { Search, RefreshCw, X, Inbox, ShieldCheck, Store as StoreIcon, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { CouponCard } from "@/components/CouponCard";
 import { ProductChecker } from "@/components/ProductChecker";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -222,45 +222,60 @@ export default function Home() {
             )}
           </div>
 
-          {/* MOBILE: menus suspensos compactos (nada cortado) */}
-          <div className="flex flex-col gap-2 sm:hidden">
-            <div className="flex gap-2">
-              <select
-                value={store}
-                onChange={(e) => setStore(e.target.value as StoreFilter)}
-                aria-label="Filtrar por loja"
-                className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-700 outline-none focus:border-brand-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
-              >
-                <option value="all">Todas as lojas</option>
-                {(Object.keys(STORE_META) as Store[]).map((s) => (
-                  <option key={s} value={s}>
-                    {STORE_META[s].label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as StatusFilter)}
-                aria-label="Filtrar por status"
-                className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-700 outline-none focus:border-brand-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
-              >
-                {STATUS_TABS.map((t) => (
-                  <option key={t.key} value={t.key}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
+          {/* MOBILE: dropdowns estilizados (combinando com o tema) */}
+          <div className="flex flex-col gap-2.5 sm:hidden">
+            <div className="flex gap-2.5">
+              {/* Loja */}
+              <div className="group relative min-w-0 flex-1">
+                <StoreIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-500 dark:text-brand-300" />
+                <select
+                  value={store}
+                  onChange={(e) => setStore(e.target.value as StoreFilter)}
+                  aria-label="Filtrar por loja"
+                  className="w-full cursor-pointer appearance-none rounded-xl border border-zinc-200 bg-white py-2.5 pl-9 pr-9 text-sm font-medium text-zinc-700 shadow-sm outline-none transition [color-scheme:light] focus:border-brand-400 focus:ring-2 focus:ring-brand-500/25 dark:border-cyan-400/20 dark:bg-white/[0.06] dark:text-zinc-100 dark:shadow-[0_0_0_1px_rgba(34,211,238,0.04)] dark:backdrop-blur dark:[color-scheme:dark]"
+                >
+                  <option value="all">Todas as lojas</option>
+                  {(Object.keys(STORE_META) as Store[]).map((s) => (
+                    <option key={s} value={s}>
+                      {STORE_META[s].label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition group-focus-within:text-brand-500 dark:group-focus-within:text-brand-300" />
+              </div>
+              {/* Status */}
+              <div className="group relative min-w-0 flex-1">
+                <SlidersHorizontal className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-500 dark:text-brand-300" />
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as StatusFilter)}
+                  aria-label="Filtrar por status"
+                  className="w-full cursor-pointer appearance-none rounded-xl border border-zinc-200 bg-white py-2.5 pl-9 pr-9 text-sm font-medium text-zinc-700 shadow-sm outline-none transition [color-scheme:light] focus:border-brand-400 focus:ring-2 focus:ring-brand-500/25 dark:border-cyan-400/20 dark:bg-white/[0.06] dark:text-zinc-100 dark:shadow-[0_0_0_1px_rgba(34,211,238,0.04)] dark:backdrop-blur dark:[color-scheme:dark]"
+                >
+                  {STATUS_TABS.map((t) => (
+                    <option key={t.key} value={t.key}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition group-focus-within:text-brand-500 dark:group-focus-within:text-brand-300" />
+              </div>
             </div>
+            {/* Só confiáveis */}
             <button
               onClick={() => setTrusted((v) => !v)}
-              className={`inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+              aria-pressed={trusted}
+              className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
                 trusted
-                  ? "bg-emerald-600 text-white"
-                  : "border border-zinc-200 text-zinc-600 dark:border-zinc-800 dark:text-zinc-300"
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_8px_24px_-10px_rgba(16,185,129,0.8)]"
+                  : "border border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-cyan-400/20 dark:text-zinc-300 dark:hover:bg-white/5"
               }`}
             >
               <ShieldCheck className="h-4 w-4" />
-              {trusted ? "Só confiáveis (ativado)" : "Mostrar todos"}
+              {trusted ? "Só cupons confiáveis" : "Mostrando todos"}
+              <span
+                className={`ml-1 h-2 w-2 rounded-full ${trusted ? "bg-white/90" : "bg-zinc-300 dark:bg-zinc-600"}`}
+              />
             </button>
           </div>
 
