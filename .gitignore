@@ -21,3 +21,9 @@ data/
 # Playwright
 /test-results/
 /playwright-report/
+
+# previews/screenshots locais
+_preview.png
+_logo.png
+_*.png
+_shot.mjs
