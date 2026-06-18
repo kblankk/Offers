@@ -47,6 +47,5 @@ export const config = {
   collectIntervalMin: intMin(process.env.COLLECT_INTERVAL_MIN, 5),
   /** Canais do Telegram para varrer (previa web t.me/s/<canal>). */
   telegramChannels: csvList(process.env.TELEGRAM_CHANNELS, DEFAULT_CHANNELS),
-  headless: (process.env.HEADLESS || "true").toLowerCase() !== "false",
   dbPath: process.env.DB_PATH || "./data/coupons.json",
 } as const;

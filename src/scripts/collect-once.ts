@@ -6,7 +6,6 @@
  */
 import { collectAll } from "../lib/collector";
 import { listCoupons, stats } from "../lib/store";
-import { closeBrowser } from "../lib/browser";
 import { createLogger } from "../lib/logger";
 
 const log = createLogger("collect-once");
@@ -24,4 +23,4 @@ async function main() {
 
 main()
   .catch((e) => log.error(e.message, e))
-  .finally(() => closeBrowser().then(() => process.exit(0)));
+  .finally(() => process.exit(0));

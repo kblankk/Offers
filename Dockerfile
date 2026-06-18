@@ -1,17 +1,12 @@
-# Imagem para rodar o Cupom Radar (Next.js + Playwright) em qualquer host
-# que aceite Docker (Render, Fly.io, Railway, VPS...).
+# Imagem para rodar o Cupom Radar (Next.js) em qualquer host com Docker
+# (Render, Fly.io, Railway, VPS...). Leve: sem navegador — a coleta usa fetch.
 FROM node:22-bookworm-slim
 
 WORKDIR /app
 
 # Dependencias primeiro (cache de camadas)
 COPY package.json package-lock.json ./
-# Evita baixar o Chromium duas vezes no postinstall; instalamos com --with-deps abaixo.
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN npm ci
-
-# Chromium + bibliotecas de sistema para o Playwright
-RUN npx playwright install --with-deps chromium
 
 # Codigo e build
 COPY . .
