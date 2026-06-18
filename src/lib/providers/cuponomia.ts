@@ -1,5 +1,6 @@
 import type { RawCoupon, Store } from "../types";
 import { withPage } from "../browser";
+import { parseMinPurchase, parseScope } from "../parse";
 import type { ProviderContext } from "./provider";
 
 /**
@@ -86,64 +87,6 @@ export async function collectFromCuponomia(
     const parseVerified = (status: string[]): string | undefined =>
       status.find((s) => /verificad/i.test(s));
 
-    // Valor minimo de compra ("a partir de R$149", "acima de R$69", "compras de R$50").
-    const parseMin = (text: string): number | undefined => {
-      const m = text.match(/(?:a partir de|acima de|compras de|m[ií]nimo de|min\.?)\s*R\$\s*([\d.]+)/i);
-      if (!m) return undefined;
-      const n = Number(m[1]!.replace(/\./g, ""));
-      return Number.isFinite(n) && n > 0 ? n : undefined;
-    };
-
-    const norm = (s: string) =>
-      s.toLowerCase().normalize("NFD").replace(new RegExp(`[${String.fromCharCode(0x0300)}-${String.fromCharCode(0x036f)}]`, "g"), "");
-
-    // Categorias reconhecidas a partir do titulo/descricao.
-    // OBS: nao usar "mercado" sozinho (casaria com a loja "Mercado Livre").
-    const CATEGORIES: { label: string; re: RegExp }[] = [
-      { label: "Produtos internacionais", re: /internaciona|importad/ },
-      { label: "Moda", re: /\bmoda\b|vestuario|roupa|calcado|tenis|sapato|fashion/ },
-      { label: "Beleza", re: /beleza|perfum|cosmetic|maquiagem|skincare/ },
-      { label: "Eletrônicos", re: /eletronic|celular|smartphone|informatica|notebook|\btv\b|tecnolog|console|games?\b/ },
-      { label: "Casa", re: /\bcasa\b|movei|decora|eletrodomestic|cozinha/ },
-      { label: "Supermercado", re: /supermercado|hortifruti|mercearia|alimento|bebida|grocer/ },
-      { label: "Pet", re: /\bpet\b|petshop/ },
-      { label: "Bebês/Infantil", re: /bebe|infantil|crianca|brinquedo/ },
-      { label: "Esporte", re: /esporte|fitness|academia/ },
-      { label: "Farmácia/Saúde", re: /farmacia|medicament/ },
-      { label: "Livros", re: /\blivro|\bbook/ },
-    ];
-
-    // Determina onde o cupom vale, de forma legivel.
-    const parseScope = (
-      text: string,
-      storeWide: boolean,
-    ): { scope: string; general: boolean } => {
-      // Remove o nome da loja para nao confundir com categoria.
-      const t = norm(text).replace(/mercado livre|mercadolivre|amazon|shopee/g, " ");
-      const cats = CATEGORIES.filter((c) => c.re.test(t)).map((c) => c.label);
-      const selected = /selecionad/.test(t);
-      const firstBuy = /primeira compra|1a compra|novos clientes|novos usuarios/.test(t);
-      const inApp = /\bno app\b|pelo app|aplicativo/.test(t);
-      const freeShip = /frete gratis/.test(t);
-
-      const parts: string[] = [];
-      if (cats.length) parts.push(...cats);
-      else if (storeWide) parts.push("Site todo");
-      else if (selected) parts.push("Itens selecionados");
-      // Sem categoria e sem confirmacao de site-todo: NAO afirmamos "Geral"
-      // (a fonte costuma omitir restricoes que existem na loja). Avisamos.
-      else parts.push("Pode ter restrições — ver no checkout");
-
-      if (selected && cats.length) parts.push("selecionados");
-      if (firstBuy) parts.push("1ª compra");
-      if (inApp) parts.push("no app");
-      if (freeShip) parts.push("frete grátis");
-
-      // So afirmamos "geral/site todo" quando a fonte confirma explicitamente.
-      const general = storeWide && cats.length === 0 && !selected && !firstBuy;
-      return { scope: parts.join(" · "), general };
-    };
-
     // Alguns "codigos" sao na verdade placeholders ("Ative o cupom no link"),
     // i.e. nao ha codigo digitavel — o desconto e ativado pelo link (exclusivo).
     const isPlaceholder = (code: string) => /ative|no link|ver cupom|clique|resgat/i.test(code);
@@ -171,7 +114,7 @@ export async function collectFromCuponomia(
         verifiedText: parseVerified(r.status),
         usesToday: parseUses(r.status),
         exclusive: r.exclusive,
-        minPurchase: parseMin(`${r.desc} ${r.title}`),
+        minPurchase: parseMinPurchase(`${r.desc} ${r.title}`),
         ...(() => {
           const s = parseScope(`${r.title} ${r.desc}`, r.storeWide);
           return { scope: s.scope, scopeGeneral: s.general };

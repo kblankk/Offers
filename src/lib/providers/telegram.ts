@@ -1,4 +1,5 @@
 import type { RawCoupon, Store } from "../types";
+import { parseDiscountText, parseMinPurchase, parseScope } from "../parse";
 import type { ProviderContext } from "./provider";
 
 /**
@@ -70,14 +71,6 @@ function extractTitle(lines: string[]): string {
   return "Cupom";
 }
 
-function extractDiscount(text: string): string | undefined {
-  const pct = text.match(/(\d{1,2})\s*%\s*(?:de\s*)?(?:off|desconto)?/i);
-  if (pct) return `${pct[1]}% OFF`;
-  const price = text.match(/por\s*:?\s*R?\$?\s*([\d.]+)\s*(?:reais|R\$)?/i);
-  if (price) return `Por R$ ${price[1]}`;
-  return undefined;
-}
-
 async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawCoupon[]> {
   const url = `https://t.me/s/${channel}`;
   const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; CupomRadar/1)" } });
@@ -96,14 +89,19 @@ async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawC
     const store = detectStore(text);
     if (!store) continue;
     const lines = text.split("\n");
+    const title = extractTitle(lines);
+    const { scope, general } = parseScope(`${title} ${text}`, false);
     coupons.push({
       store,
       kind: "code",
       code,
-      title: extractTitle(lines),
+      title,
       description: text.replace(/\n+/g, " ").slice(0, 180),
       url: extractUrl(text) ?? url,
-      discountText: extractDiscount(text),
+      discountText: parseDiscountText(text),
+      minPurchase: parseMinPurchase(text),
+      scope,
+      scopeGeneral: general,
       source: `telegram:${channel}`,
       expiresAt: null,
     });

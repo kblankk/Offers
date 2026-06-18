@@ -76,6 +76,11 @@ export function couponId(store: Store, code: string | null, url: string): string
  * ou pouco uso = media; sem qualquer sinal = baixa.
  */
 function confidenceFrom(raw: RawCoupon): { confidence: Coupon["confidence"]; reason: string } {
+  // Cupons recem-postados em canais de cupom sao um sinal forte (alguem acabou
+  // de compartilhar como funcional) — tratamos como alta confianca/fresco.
+  if (raw.source?.startsWith("telegram:")) {
+    return { confidence: "high", reason: `Recém-postado no Telegram @${raw.source.slice(9)}` };
+  }
   const verifiedToday = /hoje/i.test(raw.verifiedText ?? "");
   const uses = raw.usesToday ?? 0;
   if (verifiedToday && uses >= 50) {
@@ -97,17 +102,19 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
 
   const { confidence, reason } = confidenceFrom(raw);
   const today = now.slice(0, 10);
-  const uses = raw.usesToday ?? 0;
+  // So consideramos "usados hoje" quando a fonte REALMENTE informa esse numero
+  // (Cuponomia). Fontes sem esse dado (Telegram) nao devem zerar o contador.
+  const hasUses = typeof raw.usesToday === "number";
 
   if (existing) {
-    // Rastreio de "usados hoje" para detectar esgotamento.
     const sameDay = existing.usesDate === today;
     const prevPeak = sameDay ? existing.usesPeak ?? 0 : 0;
+    const uses = hasUses ? (raw.usesToday as number) : (sameDay ? existing.usesToday ?? 0 : 0);
     const peak = Math.max(prevPeak, uses);
 
     // Queda significativa no mesmo dia (o contador so deveria crescer) => sinal
-    // forte de que o cupom parou de funcionar / esgotou.
-    const draining = sameDay && prevPeak >= 20 && uses < prevPeak * 0.5;
+    // forte de esgotamento. So avaliamos quando a fonte informou os usos.
+    const draining = hasUses && sameDay && prevPeak >= 20 && uses < prevPeak * 0.5;
 
     const updated: Coupon = {
       ...existing,
@@ -116,9 +123,9 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
       discountText: raw.discountText ?? existing.discountText,
       imageUrl: raw.imageUrl ?? existing.imageUrl,
       verifiedText: raw.verifiedText ?? existing.verifiedText,
-      usesToday: uses,
-      usesPeak: peak,
-      usesDate: today,
+      usesToday: hasUses || sameDay ? uses : existing.usesToday,
+      usesPeak: Math.max(peak, existing.usesPeak ?? 0),
+      usesDate: hasUses ? today : existing.usesDate,
       exclusive: raw.exclusive ?? existing.exclusive,
       minPurchase: raw.minPurchase ?? existing.minPurchase,
       scope: raw.scope ?? existing.scope,
@@ -150,8 +157,8 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
     discountText: raw.discountText,
     imageUrl: raw.imageUrl,
     verifiedText: raw.verifiedText,
-    usesToday: uses,
-    usesPeak: uses,
+    usesToday: raw.usesToday ?? 0,
+    usesPeak: raw.usesToday ?? 0,
     usesDate: today,
     exclusive: raw.exclusive,
     minPurchase: raw.minPurchase,

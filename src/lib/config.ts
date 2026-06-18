@@ -26,7 +26,16 @@ function csvList(value: string | undefined, fallback: string[]): string[] {
 }
 
 // Canais publicos de cupom no Telegram (sobrescreva com TELEGRAM_CHANNELS).
-const DEFAULT_CHANNELS = ["economizandocomjp", "pechinchou", "promobit", "cuponomia"];
+// Selecionados por varredura: os que mais postam codigos reais com loja.
+const DEFAULT_CHANNELS = [
+  "economizandocomjp",
+  "pechinchou",
+  "promobit",
+  "cuponomia",
+  "ofertasdodia",
+  "cupomdedesconto",
+  "achadinhosshopee",
+];
 
 export const config = {
   enabledStores: enabled.length ? enabled : VALID_STORES,

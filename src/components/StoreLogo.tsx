@@ -6,7 +6,7 @@ export function StoreLogo({ store, src, size = 44 }: { store: Store; src?: strin
   const meta = STORE_META[store];
   return (
     <div
-      className="flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white ring-1 ring-slate-200"
+      className="flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white ring-1 ring-slate-200 dark:bg-white/90 dark:ring-white/10"
       style={{ width: size, height: size }}
       title={meta.label}
     >
