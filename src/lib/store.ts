@@ -3,6 +3,7 @@ import { dirname } from "node:path";
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync, statSync } from "node:fs";
 import { config } from "./config";
 import { createLogger } from "./logger";
+import { normalizeText, PRODUCT_NOUNS } from "./parse";
 import type { Coupon, CouponStatus, RawCoupon, Store, VerificationResult } from "./types";
 
 const log = createLogger("store");
@@ -246,8 +247,13 @@ export function listCoupons(filter: ListFilter = {}): Coupon[] {
   reloadIfChanged();
   let items = [...data.values()];
   // Rede de seguranca: esconde deals de produto (preco "Por R$ ..." em vez de
-  // um desconto). So mostramos cupons de verdade (% OFF ou R$ OFF).
-  items = items.filter((c) => !/^por\b/i.test(c.discountText ?? ""));
+  // um desconto), e cupons do Telegram cujo titulo e um produto concreto
+  // (ex.: furadeira/TV) mesmo que tenham sido coletados antes do filtro.
+  items = items.filter(
+    (c) =>
+      !/^por\b/i.test(c.discountText ?? "") &&
+      !((c.source ?? "").startsWith("telegram") && PRODUCT_NOUNS.test(normalizeText(c.title))),
+  );
   if (filter.store) items = items.filter((c) => c.store === filter.store);
   if (filter.status) items = items.filter((c) => c.status === filter.status);
   if (filter.trustedOnly) items = items.filter((c) => c.confidence === "high");

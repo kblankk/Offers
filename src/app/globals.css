@@ -37,15 +37,16 @@ body {
   background-color: #060b13;
   color: #e6edf6;
   background-image:
-    /* glows suaves (borrado) */
+    /* glows suaves (borrado) — ciano de acao + violeta/magenta que ecoa o logo */
     radial-gradient(42rem 30rem at 16% 8%, rgba(13, 148, 161, 0.30), transparent 60%),
-    radial-gradient(40rem 28rem at 86% 14%, rgba(245, 158, 11, 0.13), transparent 60%),
+    radial-gradient(38rem 28rem at 88% 6%, rgba(168, 85, 247, 0.20), transparent 60%),
+    radial-gradient(44rem 30rem at 78% 30%, rgba(217, 70, 239, 0.14), transparent 62%),
     radial-gradient(52rem 34rem at 50% 112%, rgba(34, 211, 238, 0.20), transparent 62%),
-    radial-gradient(30rem 24rem at 94% 86%, rgba(14, 116, 144, 0.22), transparent 60%),
+    radial-gradient(30rem 24rem at 6% 80%, rgba(139, 92, 246, 0.16), transparent 60%),
     /* grade fina estilo circuito */
     linear-gradient(rgba(56, 189, 248, 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(56, 189, 248, 0.045) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 46px 46px, 46px 46px;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 46px 46px, 46px 46px;
   background-attachment: fixed;
 }
 

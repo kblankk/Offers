@@ -131,8 +131,9 @@ export default function Home() {
         {/* brilhos decorativos borrados (so no dark) */}
         <div className="pointer-events-none absolute inset-0 -z-10 hidden overflow-visible dark:block">
           <div className="animate-glow absolute -left-24 -top-10 h-72 w-72 rounded-full bg-cyan-500/25 blur-3xl" />
-          <div className="animate-glow absolute right-0 top-6 h-64 w-64 rounded-full bg-amber-400/15 blur-3xl [animation-delay:2s]" />
-          <div className="animate-glow absolute left-1/3 top-40 h-72 w-72 rounded-full bg-teal-500/20 blur-3xl [animation-delay:4s]" />
+          <div className="animate-glow absolute right-4 top-2 h-64 w-64 rounded-full bg-fuchsia-500/20 blur-3xl [animation-delay:2s]" />
+          <div className="animate-glow absolute right-1/4 top-28 h-56 w-56 rounded-full bg-violet-500/18 blur-3xl [animation-delay:5s]" />
+          <div className="animate-glow absolute left-1/3 top-44 h-72 w-72 rounded-full bg-teal-500/18 blur-3xl [animation-delay:4s]" />
         </div>
 
         <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/70 px-3 py-1 text-xs font-medium text-zinc-500 backdrop-blur dark:border-cyan-400/15 dark:bg-white/5 dark:text-zinc-300">
@@ -200,7 +201,8 @@ export default function Home() {
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Filtros: no mobile rolam na horizontal (não quebram em várias fileiras) */}
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar sm:mx-0 sm:flex-wrap sm:px-0">
             <Chip active={store === "all"} onClick={() => setStore("all")}>
               Todas as lojas
             </Chip>
@@ -209,16 +211,16 @@ export default function Home() {
                 {STORE_META[s].label}
               </Chip>
             ))}
-            <span className="mx-1 hidden h-5 w-px bg-zinc-200 dark:bg-zinc-800 sm:block" />
+          </div>
+          <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 no-scrollbar sm:mx-0 sm:flex-wrap sm:px-0">
             {STATUS_TABS.map((t) => (
               <Chip key={t.key} active={status === t.key} onClick={() => setStatus(t.key)}>
                 {t.label}
               </Chip>
             ))}
-            <span className="mx-1 hidden h-5 w-px bg-zinc-200 dark:bg-zinc-800 sm:block" />
             <button
               onClick={() => setTrusted((v) => !v)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
                 trusted
                   ? "bg-emerald-600 text-white"
                   : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
@@ -292,7 +294,7 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
         active
           ? "bg-zinc-900 text-white dark:bg-brand-400 dark:text-zinc-950 dark:shadow-[0_0_14px_-2px_rgba(34,211,238,0.7)]"
           : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-cyan-400/15 dark:text-zinc-300 dark:hover:bg-white/5"

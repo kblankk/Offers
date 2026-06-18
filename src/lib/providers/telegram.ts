@@ -1,10 +1,5 @@
 import type { RawCoupon, Store } from "../types";
-import { normalizeText, parseDiscountText, parseMinPurchase, parseScope } from "../parse";
-
-// Nomes de produtos concretos: se o post cita um destes, e um DEAL de produto
-// (ex.: furadeira, TV, celular), nao um cupom generico — descartamos.
-const PRODUCT_NOUNS =
-  /furadeira|parafusadeira|aspirador|extratora|geladeira|fogao|microondas|lavadora|secadora|cafeteira|liquidificador|batedeira|air ?fryer|fritadeira|smart ?tv|\btvs?\b|televis|celular|smartphone|iphone|galaxy|motorola|xiaomi|redmi|notebook|laptop|\bmonitor|teclado|\bmouse\b|headset|\bfones?\b|caixa de som|console|playstation|xbox|nintendo|cadeira|\bsofas?\b|colchao|\bmesas?\b|\btenis\b|camiseta|\bcalca|vestido|jaqueta|perfume|shampoo|\bwhey\b|creatina|suplemento|bicicleta|patinete|\bbola\b|brinquedo|boneca|fralda|\bpanela|garrafa|mochila|relogio|smartwatch|airpod|echo dot|\balexa\b|ventilador|impressora|cafe |\bdrone\b|violao|teclado musical|ferramenta|chave de fenda/;
+import { normalizeText, parseDiscountText, parseMinPurchase, parseScope, PRODUCT_NOUNS } from "../parse";
 import type { ProviderContext } from "./provider";
 
 /**
