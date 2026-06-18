@@ -76,24 +76,35 @@ export function couponId(store: Store, code: string | null, url: string): string
  * "verificado hoje" + muita gente usando hoje = alta; verificado ha mais tempo
  * ou pouco uso = media; sem qualquer sinal = baixa.
  */
+/** "Verificado hoje/ontem/há N dias" -> nº de dias (Infinity se nao verificado). */
+export function verifiedDaysAgo(verifiedText?: string): number {
+  const t = (verifiedText ?? "").toLowerCase();
+  if (!t) return Infinity;
+  if (/hoje/.test(t)) return 0;
+  if (/ontem/.test(t)) return 1;
+  const m = t.match(/(\d+)\s*dias?/);
+  if (m) return Number(m[1]);
+  return /verificad/.test(t) ? 0 : Infinity;
+}
+
 function confidenceFrom(raw: RawCoupon): { confidence: Coupon["confidence"]; reason: string } {
   // Cupons recem-postados em canais de cupom sao um sinal forte (alguem acabou
   // de compartilhar como funcional) — tratamos como alta confianca/fresco.
   if (raw.source?.startsWith("telegram:")) {
     return { confidence: "high", reason: `Recém-postado no Telegram @${raw.source.slice(9)}` };
   }
-  const verifiedToday = /hoje/i.test(raw.verifiedText ?? "");
+  // Cuponomia: confianca pela RECENCIA da verificacao + uso de hoje.
+  // Cupom esgotado tende a ter verificacao antiga E pouco uso.
+  const days = verifiedDaysAgo(raw.verifiedText);
   const uses = raw.usesToday ?? 0;
-  if (verifiedToday && uses >= 50) {
-    return { confidence: "high", reason: `Verificado hoje · ${uses} usaram hoje` };
-  }
-  if (verifiedToday || uses >= 50) {
-    return { confidence: "high", reason: raw.verifiedText ?? `${uses} usaram hoje` };
-  }
-  if (raw.verifiedText || uses > 0) {
-    return { confidence: "medium", reason: raw.verifiedText ?? `${uses} usaram hoje` };
-  }
-  return { confidence: "low", reason: "Sem verificacao recente na fonte" };
+  const reason = raw.verifiedText ? `${raw.verifiedText} · ${uses} usaram hoje` : `${uses} usaram hoje`;
+
+  // Alta: verificado no ultimo dia OU claramente em uso hoje.
+  if (days <= 1 || uses >= 150) return { confidence: "high", reason };
+  // Media: verificado ate ~3 dias OU algum uso hoje.
+  if (days <= 3 || uses >= 30) return { confidence: "medium", reason };
+  // Baixa: verificacao antiga e pouco uso -> provavelmente esgotado/expirado.
+  return { confidence: "low", reason: raw.verifiedText ? reason : "Sem verificacao recente na fonte" };
 }
 
 export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean } {
@@ -214,8 +225,11 @@ export function applyVerification(id: string, result: VerificationResult): void 
  *    a aparecer) => folga bem maior.
  */
 export const EXPIRY_MS = {
-  aggregator: 3 * 60 * 60 * 1000,
-  other: 12 * 60 * 60 * 1000,
+  // Cuponomia e re-lido a cada coleta (~2 min). Se um cupom cai da lista, ja
+  // era — expira rapido (45 min tolera falhas pontuais de scraping).
+  aggregator: 45 * 60 * 1000,
+  // Telegram sao posts esparsos; folga maior, mas cupom velho costuma esgotar.
+  other: 8 * 60 * 60 * 1000,
 } as const;
 
 /** Um cupom que sumiu da(s) fonte(s) ha tempo demais (segundo o prazo da fonte). */
