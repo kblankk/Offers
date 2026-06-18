@@ -1,0 +1,23 @@
+name: Coleta periodica (mantem cupons frescos 24/7)
+
+# Aciona /api/collect no app publicado a cada 5 min. Isso acorda a instancia
+# gratuita do Render (que dorme sem acesso) e coleta cupons novos mesmo sem
+# ninguem visitando o site — garantindo que peguemos os cupons com antecedencia.
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {} # permite rodar manualmente pela aba Actions
+
+# Evita execucoes sobrepostas.
+concurrency:
+  group: coleta
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar coleta
+        run: |
+          curl -fsS -X POST "https://offers-1gpo.onrender.com/api/collect" --max-time 150 || true

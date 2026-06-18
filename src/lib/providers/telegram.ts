@@ -41,24 +41,47 @@ function detectStore(text: string): Store | undefined {
   return undefined;
 }
 
-/** Extrai o codigo do cupom do texto do post. */
+const BLOCK = new Set([
+  "AQUI", "LINK", "HOJE", "AGORA", "GRATIS", "OFF", "AMAZON", "SHOPEE", "MERCADO",
+  "LIVRE", "MELI", "DESCONTO", "DESCONTOS", "PROMO", "PROMOCAO", "OFERTA", "OFERTAS",
+  "CUPOM", "CUPONS", "CODIGO", "VOUCHER", "FRETE", "REAIS", "COMPRE", "GANHE", "LOJA", "SITE",
+  "HTTP", "HTTPS", "WWW", "COM", "PARA", "VALE", "ABAIXO", "PRECO", "PRECINHO", "QUASE", "TODO",
+  "DESCONTOS", "LIMITADO", "ATIVE", "RESGATE", "SALVE", "AGORA",
+]);
+
+function isValidCode(raw: string): boolean {
+  if (BLOCK.has(raw)) return false;
+  if (/^HTTP/.test(raw)) return false;
+  // Bom codigo: tem ao menos um digito OU >= 5 chars maiusculos.
+  if (!/[0-9]/.test(raw) && raw.length < 5) return false;
+  return true;
+}
+
+/**
+ * Extrai o codigo do cupom do texto do post. Robusto a:
+ *  - emoji/simbolos entre a palavra-chave e o codigo ("Código: 🎟️ CHUTEIRA");
+ *  - codigo apos "OFF:" ("R$40 OFF: CHUTEIRA");
+ *  - codigo isolado numa linha propria.
+ * Captura SEMPRE em MAIUSCULAS (codigos sao maiusculos), tolerando ate 12
+ * caracteres nao-alfanumericos (emoji, ":", espacos) depois da palavra-chave.
+ */
 function extractCode(text: string): string | null {
-  // "CUPOM: X", "use o cupom X", "cupom: X", "codigo X", "voucher X"
-  const m = text.match(/(?:cupom|c[oó]digo|voucher|cod\.?)\s*:?\s*([A-Z0-9][A-Z0-9._-]{3,24})/i);
-  if (!m) return null;
-  const raw = m[1]!.toUpperCase().replace(/[._-]+$/, "");
-  // Evita capturar palavras comuns / nomes de loja / URLs como se fossem codigo.
-  const BLOCK = new Set([
-    "AQUI", "LINK", "HOJE", "AGORA", "GRATIS", "OFF", "AMAZON", "SHOPEE", "MERCADO",
-    "LIVRE", "MELI", "DESCONTO", "DESCONTOS", "PROMO", "PROMOCAO", "OFERTA", "OFERTAS",
-    "CUPOM", "CUPONS", "CODIGO", "VOUCHER", "FRETE", "REAIS", "COMPRE", "GANHE", "LOJA", "SITE",
-    "HTTP", "HTTPS", "WWW", "COM", "PARA", "VALE", "ABAIXO", "PRECO", "PRECINHO",
-  ]);
-  if (BLOCK.has(raw)) return null;
-  if (/^HTTP/.test(raw)) return null; // qualquer coisa de URL
-  // Bom codigo: tem ao menos um digito OU >=5 chars maiusculos.
-  if (!/[0-9]/.test(raw) && raw.length < 5) return null;
-  return raw;
+  // a) apos palavra-chave (cupom/codigo/voucher/off), pulando emojis/simbolos
+  const re = /(?:cupom|c[oó]digo|voucher|\bcod\b|\boff\b)[^\p{L}\p{N}\n]{0,12}([A-Z][A-Z0-9._-]{3,23})/giu;
+  let mt: RegExpExecArray | null;
+  while ((mt = re.exec(text)) !== null) {
+    const cand = mt[1]!.toUpperCase().replace(/[._-]+$/, "");
+    if (isValidCode(cand)) return cand;
+  }
+  // b) codigo isolado em uma linha (ex.: linha so com "🎟️ CHUTEIRA")
+  for (const line of text.split("\n")) {
+    const mm = line.trim().match(/^[^\p{L}\p{N}]{0,6}([A-Z][A-Z0-9]{4,23})[^\p{L}\p{N}]{0,6}$/u);
+    if (mm) {
+      const cand = mm[1]!.toUpperCase();
+      if (isValidCode(cand)) return cand;
+    }
+  }
+  return null;
 }
 
 function extractUrl(text: string): string | null {
@@ -101,10 +124,12 @@ async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawC
     // "de R$X por R$Y"). Cupom de verdade traz um DESCONTO (% OFF ou R$ OFF).
     const discount = parseDiscountText(text);
     const hasRealDiscount = !!discount && /%|off/i.test(discount);
+    // PRECO de produto = quanto se PAGA ("POR R$ 61", "POR 1349 REAIS", "de R$X por R$Y").
+    // NAO confundir com desconto/economia ("economize R$40", "R$40 OFF", "ate R$40").
     const looksLikeProductPrice =
-      /\bpor\b\s*:?\s*r?\$?\s*\d/i.test(text) ||
-      /\d+\s*reais/i.test(text) ||
-      /de\s*r\$\s*[\d.,]+\s*por/i.test(text);
+      /\bpor\s*:?\s*r\$\s*[\d.,]+/i.test(text) ||
+      /\bpor\s*:?\s*[\d.,]+\s*reais/i.test(text) ||
+      /de\s*r\$\s*[\d.,]+\s*por\s*r\$/i.test(text);
     const looksLikeProduct = PRODUCT_NOUNS.test(normalizeText(text));
     if (!hasRealDiscount || looksLikeProductPrice || looksLikeProduct) continue;
 
