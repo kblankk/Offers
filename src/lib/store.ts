@@ -116,21 +116,30 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
     // forte de esgotamento. So avaliamos quando a fonte informou os usos.
     const draining = hasUses && sameDay && prevPeak >= 20 && uses < prevPeak * 0.5;
 
+    // O Cuponomia e a fonte CANONICA para os campos descritivos (titulo, escopo,
+    // condicoes). Um post do Telegram NAO deve sobrescrever esses campos de um
+    // codigo generico (senao um codigo de site herda o titulo de um produto
+    // especifico do post). Telegram so "promove" um codigo novo ou atualiza
+    // quando ja era a propria fonte.
+    const incomingCuponomia = raw.source === "cuponomia";
+    const existingCuponomia = existing.source === "cuponomia";
+    const useIncomingDesc = incomingCuponomia || !existingCuponomia;
+
     const updated: Coupon = {
       ...existing,
-      title: raw.title,
-      description: raw.description ?? existing.description,
-      discountText: raw.discountText ?? existing.discountText,
-      imageUrl: raw.imageUrl ?? existing.imageUrl,
+      title: useIncomingDesc ? raw.title : existing.title,
+      description: useIncomingDesc ? raw.description ?? existing.description : existing.description,
+      discountText: useIncomingDesc ? raw.discountText ?? existing.discountText : existing.discountText,
+      imageUrl: useIncomingDesc ? raw.imageUrl ?? existing.imageUrl : existing.imageUrl,
       verifiedText: raw.verifiedText ?? existing.verifiedText,
       usesToday: hasUses || sameDay ? uses : existing.usesToday,
       usesPeak: Math.max(peak, existing.usesPeak ?? 0),
       usesDate: hasUses ? today : existing.usesDate,
       exclusive: raw.exclusive ?? existing.exclusive,
-      minPurchase: raw.minPurchase ?? existing.minPurchase,
-      scope: raw.scope ?? existing.scope,
-      scopeGeneral: raw.scopeGeneral ?? existing.scopeGeneral,
-      source: raw.source ?? existing.source,
+      minPurchase: useIncomingDesc ? raw.minPurchase ?? existing.minPurchase : existing.minPurchase,
+      scope: useIncomingDesc ? raw.scope ?? existing.scope : existing.scope,
+      scopeGeneral: useIncomingDesc ? raw.scopeGeneral ?? existing.scopeGeneral : existing.scopeGeneral,
+      source: useIncomingDesc ? raw.source : existing.source,
       kind: raw.kind,
       expiresAt: raw.expiresAt ?? existing.expiresAt,
       status: draining ? "suspected_exhausted" : "active",

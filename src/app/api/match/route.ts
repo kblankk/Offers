@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { fetchProduct } from "@/lib/product";
 import { listCoupons } from "@/lib/store";
+import { detectCategories } from "@/lib/parse";
 import type { Coupon } from "@/lib/types";
+
+// detectCategories ainda e usado dentro de fitFor (categorias do cupom).
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,36 +15,54 @@ export interface Fit {
   note: string;
 }
 
-/** Avalia se um cupom se encaixa no produto (preco vs minimo + escopo). */
-function fitFor(c: Coupon, price?: number): Fit {
+/**
+ * Avalia, de forma RIGIDA, se um cupom serve para o produto:
+ *  - valor minimo vs preco (quando conhecido);
+ *  - categoria: um cupom de categoria especifica (Moda, Casa, etc.) so serve
+ *    se a categoria do produto bater. Se nao bater => "no" (excluido).
+ */
+function fitFor(coupon: Coupon, productCats: string[], price?: number): Fit {
   const reasons: string[] = [];
   let level: FitLevel = "yes";
 
-  if (typeof c.minPurchase === "number") {
+  // 1. valor minimo
+  if (typeof coupon.minPurchase === "number") {
+    if (price !== undefined && price < coupon.minPurchase) {
+      return { level: "no", note: `produto R$${Math.round(price)} abaixo do mínimo R$${coupon.minPurchase}` };
+    }
     if (price === undefined) {
       level = "maybe";
-      reasons.push(`exige mín. R$${c.minPurchase} (não consegui o preço do anúncio)`);
-    } else if (price < c.minPurchase) {
-      level = "no";
-      reasons.push(`produto R$${Math.round(price)} é menor que o mínimo R$${c.minPurchase}`);
+      reasons.push(`confira o mínimo de R$${coupon.minPurchase}`);
     } else {
-      reasons.push(`atende o mínimo de R$${c.minPurchase}`);
+      reasons.push(`atende o mínimo de R$${coupon.minPurchase}`);
     }
   }
 
-  if (level !== "no") {
-    if (c.scopeGeneral) {
-      reasons.push("vale no site todo");
-    } else if (/restri|checkout/i.test(c.scope ?? "")) {
+  // 2. categoria/escopo
+  const couponCats = detectCategories(`${coupon.scope ?? ""} ${coupon.title} ${coupon.description ?? ""}`);
+
+  if (coupon.scopeGeneral) {
+    reasons.push("vale no site todo");
+  } else if (couponCats.length > 0) {
+    // cupom de categoria especifica: precisa casar com o produto
+    if (productCats.length > 0) {
+      const overlap = couponCats.some((c) => productCats.includes(c));
+      if (!overlap) {
+        return { level: "no", note: `cupom é de outra categoria (${couponCats.join(", ")})` };
+      }
+      reasons.push(`categoria compatível (${couponCats.filter((c) => productCats.includes(c)).join(", ")})`);
+    } else {
+      // nao sabemos a categoria do produto
       if (level === "yes") level = "maybe";
-      reasons.push("pode ter restrições — confira no checkout");
-    } else if (c.scope) {
-      if (level === "yes") level = "maybe";
-      reasons.push(`só vale em: ${c.scope}`);
+      reasons.push(`vale só em ${couponCats.join(", ")} — confira se seu produto é dessa categoria`);
     }
+  } else {
+    // sem categoria e sem confirmacao de site-todo: incerto
+    if (level === "yes") level = "maybe";
+    reasons.push("pode ter restrições — confira no checkout");
   }
 
-  return { level, note: reasons.join(" · ") || "Sem condições conhecidas" };
+  return { level, note: reasons.join(" · ") };
 }
 
 const RANK: Record<FitLevel, number> = { yes: 0, maybe: 1, no: 2 };
@@ -61,9 +82,12 @@ export async function POST(req: Request) {
   }
 
   const { product } = result;
-  const active = listCoupons({ store: product.store, status: "active" });
-  const coupons = active
-    .map((c) => ({ ...c, fit: fitFor(c, product.price) }))
+  const productCats = product.categories;
+
+  const coupons = listCoupons({ store: product.store, status: "active" })
+    .map((c) => ({ ...c, fit: fitFor(c, productCats, product.price) }))
+    // RIGIDO: nao mostramos o que claramente nao serve.
+    .filter((c) => c.fit.level !== "no")
     .sort((a, b) => {
       if (RANK[a.fit.level] !== RANK[b.fit.level]) return RANK[a.fit.level] - RANK[b.fit.level];
       const ca = CONF[a.confidence] ?? 9;
@@ -72,5 +96,5 @@ export async function POST(req: Request) {
       return (b.usesToday ?? 0) - (a.usesToday ?? 0);
     });
 
-  return NextResponse.json({ product, coupons });
+  return NextResponse.json({ product: { ...product, categories: productCats }, coupons });
 }

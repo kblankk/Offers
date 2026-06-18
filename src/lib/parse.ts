@@ -33,15 +33,15 @@ export function parseDiscountText(text: string): string | undefined {
 
 // Categorias reconhecidas no titulo/descricao.
 // OBS: nao usar "mercado" sozinho (casaria com a loja "Mercado Livre").
-const CATEGORIES: { label: string; re: RegExp }[] = [
+export const CATEGORIES: { label: string; re: RegExp }[] = [
   { label: "Produtos internacionais", re: /internaciona|importad/ },
   { label: "Moda", re: /\bmoda\b|vestuario|roupa|calcado|tenis|sapato|fashion|camiseta/ },
   { label: "Beleza", re: /beleza|perfum|cosmetic|maquiagem|skincare|cabelo/ },
   {
     label: "Eletrônicos",
-    re: /eletronic|celular|smartphone|informatica|notebook|\btv\b|tecnolog|console|games?\b|monitor|fone/,
+    re: /eletronic|celular|smartphone|informatica|notebook|\btv\b|tecnolog|console|games?\b|gamer|monitor|\bfone\b|headset|teclado|\bmouse\b|computador|\bpc\b|placa de video|ssd|processador|\bcabo\b|carregador|caixa de som|webcam/,
   },
-  { label: "Casa", re: /\bcasa\b|movei|decora|eletrodomestic|cozinha|colchao|sofa/ },
+  { label: "Casa", re: /\bcasa\b|movei|decora|eletrodomestic|cozinha|colchao|sofa|aspirador|extratora|limpeza/ },
   { label: "Supermercado", re: /supermercado|hortifruti|mercearia|alimento|bebida|grocer/ },
   { label: "Pet", re: /\bpet\b|petshop/ },
   { label: "Bebês/Infantil", re: /bebe|infantil|crianca|brinquedo/ },
@@ -78,4 +78,10 @@ export function parseScope(text: string, storeWide: boolean): { scope: string; g
 
   const general = storeWide && cats.length === 0 && !selected && !firstBuy;
   return { scope: parts.join(" · "), general };
+}
+
+/** Categorias detectadas num texto (titulo de produto, descricao de cupom, etc.). */
+export function detectCategories(text: string): string[] {
+  const t = normalizeText(text).replace(STORE_WORDS, " ");
+  return CATEGORIES.filter((c) => c.re.test(t)).map((c) => c.label);
 }

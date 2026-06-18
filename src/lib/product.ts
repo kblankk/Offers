@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { detectCategories } from "./parse";
 import type { Store } from "./types";
 
 /**
@@ -23,11 +24,33 @@ export interface ProductInfo {
   title?: string;
   price?: number;
   image?: string;
+  /** Categorias detectadas (a partir do titulo E do slug da URL). */
+  categories: string[];
 }
 
 function clean(s?: string): string | undefined {
   const t = s?.replace(/\s+/g, " ").trim();
   return t || undefined;
+}
+
+/**
+ * Extrai um titulo aproximado do produto a partir do slug da URL (ex.:
+ * ".../teclado-mecanico-gamer-rgb/p/MLB123" -> "teclado mecanico gamer rgb").
+ * Util quando a loja bloqueia o fetch (anti-bot) e nao temos og:title.
+ */
+function titleFromUrl(url: string): string | undefined {
+  try {
+    const { pathname } = new URL(url);
+    const seg = pathname
+      .split("/")
+      .filter(Boolean)
+      .filter((s) => !/^MLB/i.test(s) && s !== "p" && /[a-z]/i.test(s) && s.includes("-"));
+    const best = seg.sort((a, b) => b.length - a.length)[0];
+    if (!best) return undefined;
+    return clean(decodeURIComponent(best).replace(/-/g, " ").replace(/[^a-zA-ZÀ-ÿ0-9 ]/g, " "));
+  } catch {
+    return undefined;
+  }
 }
 
 /** Procura um preco em qualquer lugar de um objeto JSON-LD. */
@@ -63,7 +86,7 @@ export async function fetchProduct(rawUrl: string): Promise<FetchProductResult> 
     return { ok: false, error: "Não reconheci a loja. Use um link do Mercado Livre, Amazon ou Shopee." };
   }
 
-  const info: ProductInfo = { store, url };
+  const info: ProductInfo = { store, url, categories: [] };
   try {
     const res = await fetch(url, {
       headers: { "User-Agent": UA, "Accept-Language": "pt-BR,pt;q=0.9", "Accept-Encoding": "identity" },
@@ -99,5 +122,10 @@ export async function fetchProduct(rawUrl: string): Promise<FetchProductResult> 
   } catch {
     /* fetch bloqueado/timeout: seguimos so com a loja */
   }
+  // Slug da URL (sempre considerado p/ categoria; ML costuma ter o nome no slug).
+  const slug = titleFromUrl(url);
+  if (!info.title) info.title = slug;
+  // Categoria a partir do titulo E do slug (mais robusto que so um deles).
+  info.categories = detectCategories(`${info.title ?? ""} ${slug ?? ""}`);
   return { ok: true, product: info };
 }

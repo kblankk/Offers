@@ -18,6 +18,7 @@ interface Product {
   title?: string;
   price?: number;
   image?: string;
+  categories?: string[];
 }
 
 const FIT: Record<FitLevel, { label: string; cls: string; Icon: typeof CheckCircle2 }> = {
@@ -74,7 +75,6 @@ export function ProductChecker() {
     }
   }
 
-  const usable = coupons.filter((c) => c.fit.level !== "no");
   const meta = product ? STORE_META[product.store] : null;
 
   return (
@@ -127,18 +127,25 @@ export function ProductChecker() {
                 {product.title ?? "Anúncio detectado"}
               </p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                {product.price !== undefined
-                  ? `Preço detectado: R$ ${product.price.toLocaleString("pt-BR")}`
-                  : "Não consegui ler o preço — confira o valor mínimo de cada cupom."}
+                {product.categories && product.categories.length > 0
+                  ? `Categoria: ${product.categories.join(", ")}`
+                  : "Categoria não identificada"}
+                {product.price !== undefined ? ` · R$ ${product.price.toLocaleString("pt-BR")}` : ""}
               </p>
             </div>
           </div>
 
-          <p className="mt-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            {usable.length > 0
-              ? `${usable.length} cupom(ns) que provavelmente dá pra usar`
-              : "Não encontrei cupons aplicáveis a este anúncio agora."}
-          </p>
+          {(() => {
+            const yes = coupons.filter((c) => c.fit.level === "yes").length;
+            const maybe = coupons.length - yes;
+            const txt =
+              coupons.length === 0
+                ? "Nenhum cupom aplicável a este produto no momento."
+                : yes > 0
+                  ? `${yes} cupom(ns) combinam com este produto${maybe ? ` · +${maybe} possíveis (confira as condições)` : ""}`
+                  : `${maybe} cupom(ns) possíveis — confira as condições de cada um`;
+            return <p className="mt-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">{txt}</p>;
+          })()}
 
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {coupons.slice(0, 9).map((c) => {
