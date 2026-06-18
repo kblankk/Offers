@@ -3,10 +3,12 @@
  * em ciano neon com brilho — no estilo aprovado pelo usuario.
  * SVG => escala nitida em qualquer tamanho.
  */
-export function Logo({ className = "" }: { className?: string }) {
+export function Logo({ className = "", light = false }: { className?: string; light?: boolean }) {
+  // `light` força texto branco (para fundos sempre escuros, ex.: o header em foto).
+  const letter = light ? "text-white" : "text-zinc-900 dark:text-white";
   return (
     <span className={`display inline-flex select-none items-center text-2xl tracking-tight ${className}`}>
-      <span className="text-zinc-900 dark:text-white">allcup</span>
+      <span className={letter}>allcup</span>
       <span className="relative mx-[0.02em] inline-block h-[0.82em] w-[0.92em] translate-y-[0.04em]">
         <svg
           viewBox="0 0 26 22"
@@ -32,7 +34,7 @@ export function Logo({ className = "" }: { className?: string }) {
           </defs>
         </svg>
       </span>
-      <span className="text-zinc-900 dark:text-white">m</span>
+      <span className={letter}>m</span>
     </span>
   );
 }

@@ -126,7 +126,7 @@ export default function Home() {
 
         {/* barra de navegacao sobre a imagem */}
         <div className="relative z-10 mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
-          <Logo />
+          <Logo light />
 
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
             {NAV.map((n) => (
