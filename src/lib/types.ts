@@ -77,3 +77,22 @@ export const STORE_META: Record<Store, { label: string; color: string }> = {
   amazon: { label: "Amazon", color: "#FF9900" },
   shopee: { label: "Shopee", color: "#EE4D2D" },
 };
+
+/** Pagina oficial de cada loja (destino quando nao temos um link direto da loja). */
+export const STORE_HOME: Record<Store, string> = {
+  mercadolivre: "https://www.mercadolivre.com.br",
+  amazon: "https://www.amazon.com.br",
+  shopee: "https://shopee.com.br",
+};
+
+/**
+ * Para onde o botao "Ir a loja" deve levar:
+ * - se a URL do cupom ja for da loja (ex.: cupons do Telegram), usa ela;
+ * - senao (link do agregador, etc.), manda para a pagina oficial da loja.
+ * Nunca leva para um site intermediario "nada a ver".
+ */
+export function storeUrl(coupon: Pick<Coupon, "url" | "store">): string {
+  const u = coupon.url ?? "";
+  const isStore = /mercadolivre|mercadolibre|amazon\.|amzn\.|shopee\.com|s\.shopee|shp\.ee/i.test(u);
+  return isStore ? u : STORE_HOME[coupon.store];
+}

@@ -90,3 +90,8 @@ Affiliate), basta criar um novo provider e mapeá-lo em `providers/index.ts` —
 ### Manutenção do scraping
 Os seletores em `cuponomia.ts` podem precisar de ajuste quando o site mudar o HTML. Rode
 `npm run collect` com `HEADLESS=false` no `.env` para ver o navegador.
+
+---
+
+## 👤 Autor
+Desenvolvido por **Kawã Crispim de Oliveira** (Kawã Oliveira).

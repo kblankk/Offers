@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "description": "App web para descobrir, buscar e verificar cupons reais (codigo + %) de Mercado Livre, Amazon e Shopee.",
+  "author": "Kawã Crispim de Oliveira",
   "type": "module",
   "engines": {
     "node": ">=20"

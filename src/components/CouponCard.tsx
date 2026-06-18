@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Copy, Check, ArrowUpRight, ShieldCheck, Users, Layers, Sparkles } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
 import { StoreLogo } from "./StoreLogo";
-import { STORE_META, type Coupon } from "@/lib/types";
+import { STORE_META, storeUrl, type Coupon } from "@/lib/types";
 
 export function CouponCard({ coupon }: { coupon: Coupon }) {
   const [copied, setCopied] = useState(false);
@@ -127,7 +127,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
               )}
             </button>
             <a
-              href={coupon.url}
+              href={storeUrl(coupon)}
               target="_blank"
               rel="noopener noreferrer"
               title={coupon.exclusive ? "Ativar cupom" : "Ir à loja"}
@@ -138,7 +138,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
           </div>
         ) : (
           <a
-            href={coupon.url}
+            href={storeUrl(coupon)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"

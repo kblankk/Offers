@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Copy, Check, ArrowUpRight, ShieldCheck, Users } from "lucide-react";
 import { StoreLogo } from "./StoreLogo";
-import { STORE_META, type Coupon } from "@/lib/types";
+import { STORE_META, storeUrl, type Coupon } from "@/lib/types";
 
 /** Cupom em destaque (spotlight) — grande, editorial. */
 export function FeaturedCoupon({ coupon }: { coupon: Coupon }) {
@@ -76,7 +76,7 @@ export function FeaturedCoupon({ coupon }: { coupon: Coupon }) {
             </button>
           )}
           <a
-            href={coupon.url}
+            href={storeUrl(coupon)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-500"

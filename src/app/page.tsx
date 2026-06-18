@@ -247,6 +247,18 @@ export default function Home() {
           )}
         </div>
       </main>
+
+      <footer className="border-t border-zinc-200 dark:border-zinc-800">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-1 px-4 py-8 text-center sm:px-6">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Desenvolvido por{" "}
+            <span className="font-medium text-zinc-700 dark:text-zinc-200">Kawã Crispim de Oliveira</span>
+          </p>
+          <p className="text-xs text-zinc-400 dark:text-zinc-500">
+            Cupom Radar · {new Date().getFullYear()}
+          </p>
+        </div>
+      </footer>
     </>
   );
 }
