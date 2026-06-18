@@ -1,15 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, ArrowUpRight, ShieldCheck, Users, Layers, Sparkles } from "lucide-react";
+import { Copy, Check, ArrowUpRight, ShieldCheck, Users, Layers, Sparkles, ThumbsUp, ThumbsDown } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
 import { StoreLogo } from "./StoreLogo";
 import { STORE_META, storeUrl, type Coupon } from "@/lib/types";
 
 export function CouponCard({ coupon }: { coupon: Coupon }) {
   const [copied, setCopied] = useState(false);
+  const [vote, setVote] = useState<null | "ok" | "fail">(null);
+  const [reports, setReports] = useState({ worked: coupon.worked ?? 0, failed: coupon.failed ?? 0 });
   const meta = STORE_META[coupon.store];
   const isExpired = coupon.status === "expired";
+
+  async function sendFeedback(ok: boolean) {
+    if (vote) return;
+    setVote(ok ? "ok" : "fail");
+    setReports((r) => ({ worked: r.worked + (ok ? 1 : 0), failed: r.failed + (ok ? 0 : 1) }));
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: coupon.id, ok }),
+      });
+      const data = await res.json();
+      if (res.ok && typeof data.worked === "number") setReports({ worked: data.worked, failed: data.failed });
+    } catch {
+      /* mantem o otimista */
+    }
+  }
 
   async function copyCode() {
     if (!coupon.code) return;
@@ -145,6 +164,47 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
           >
             Ativar desconto <ArrowUpRight className="h-4 w-4" />
           </a>
+        )}
+
+        {/* Verificacao pela comunidade */}
+        {!isExpired && (
+          <div className="mt-3 flex items-center justify-between gap-2 text-xs">
+            {vote ? (
+              <span className="text-zinc-400 dark:text-zinc-500">
+                {vote === "ok" ? "Valeu pelo retorno! 👍" : "Obrigado — vamos avisar os outros."}
+              </span>
+            ) : (
+              <span className="text-zinc-400 dark:text-zinc-500">Funcionou?</span>
+            )}
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                onClick={() => sendFeedback(true)}
+                disabled={!!vote}
+                title="Funcionou"
+                className={`inline-flex items-center gap-1 rounded-md px-2 py-1 transition disabled:opacity-60 ${
+                  vote === "ok"
+                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                    : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-white/10"
+                }`}
+              >
+                <ThumbsUp className="h-3.5 w-3.5" />
+                {reports.worked > 0 && <span>{reports.worked}</span>}
+              </button>
+              <button
+                onClick={() => sendFeedback(false)}
+                disabled={!!vote}
+                title="Não funcionou / esgotado"
+                className={`inline-flex items-center gap-1 rounded-md px-2 py-1 transition disabled:opacity-60 ${
+                  vote === "fail"
+                    ? "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300"
+                    : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-white/10"
+                }`}
+              >
+                <ThumbsDown className="h-3.5 w-3.5" />
+                {reports.failed > 0 && <span>{reports.failed}</span>}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

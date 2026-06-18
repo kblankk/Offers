@@ -276,16 +276,42 @@ export interface ListFilter {
   limit?: number;
 }
 
+/** Hoje (YYYY-MM-DD) em horario local-ish (UTC serve para o reset diario). */
+function todayStr(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * "Esgotado pela comunidade": varias pessoas relataram HOJE que nao funcionou
+ * (e os relatos negativos superam os positivos). E o sinal mais preciso de
+ * esgotamento em tempo real — vem de quem realmente tentou usar.
+ */
+function communityExhausted(c: Coupon): boolean {
+  if (c.votedDate !== todayStr()) return false;
+  const failed = c.failed ?? 0;
+  const worked = c.worked ?? 0;
+  return failed >= 3 && failed > worked;
+}
+
 export function listCoupons(filter: ListFilter = {}): Coupon[] {
   reloadIfChanged();
   const now = Date.now();
-  // Guarda em tempo de leitura: cupons que sumiram da fonte ha tempo demais
-  // contam como expirados JA na exibicao (sem esperar a proxima coleta).
-  let items = [...data.values()].map((c) =>
-    isUnseenExpired(c, now)
+  // Guarda em tempo de leitura: cupons que sumiram da fonte ha tempo demais,
+  // OU que a comunidade marcou como esgotados hoje, contam como expirados JA
+  // na exibicao (sem esperar a proxima coleta).
+  let items = [...data.values()].map((c) => {
+    if (communityExhausted(c)) {
+      return {
+        ...c,
+        status: "expired" as const,
+        confidence: "low" as const,
+        statusReason: `${c.failed} pessoa(s) relataram que não funcionou hoje.`,
+      };
+    }
+    return isUnseenExpired(c, now)
       ? { ...c, status: "expired" as const, statusReason: "Saiu da lista da fonte (provavelmente esgotou ou expirou)." }
-      : c,
-  );
+      : c;
+  });
   // Rede de seguranca: esconde deals de produto (preco "Por R$ ..." em vez de
   // um desconto), e cupons do Telegram cujo titulo e um produto concreto
   // (ex.: furadeira/TV) mesmo que tenham sido coletados antes do filtro.
@@ -346,6 +372,26 @@ export function isStale(maxAgeMs: number): boolean {
   const last = lastUpdatedAt();
   if (!last) return true;
   return Date.now() - new Date(last).getTime() > maxAgeMs;
+}
+
+/**
+ * Registra um relato da comunidade (funcionou / nao funcionou). Os relatos
+ * resetam por dia. Quando os negativos passam de um limiar, o cupom some da
+ * lista (esgotado pela comunidade) — ver communityExhausted/listCoupons.
+ */
+export function recordFeedback(id: string, ok: boolean): { worked: number; failed: number } | null {
+  reloadIfChanged();
+  const c = data.get(id);
+  if (!c) return null;
+  const today = todayStr();
+  const sameDay = c.votedDate === today;
+  let worked = sameDay ? c.worked ?? 0 : 0;
+  let failed = sameDay ? c.failed ?? 0 : 0;
+  if (ok) worked++;
+  else failed++;
+  data.set(id, { ...c, worked, failed, votedDate: today });
+  persist();
+  return { worked, failed };
 }
 
 export function stats(): Record<string, number> {

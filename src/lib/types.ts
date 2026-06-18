@@ -62,6 +62,12 @@ export interface Coupon extends RawCoupon {
   usesPeak?: number;
   /** Data (YYYY-MM-DD) a que `usesPeak`/`usesToday` se referem. */
   usesDate?: string;
+  /** Relatos da comunidade no dia: confirmou que funcionou. */
+  worked?: number;
+  /** Relatos da comunidade no dia: nao funcionou / esgotado. */
+  failed?: number;
+  /** Data (YYYY-MM-DD) dos relatos worked/failed (resetam por dia). */
+  votedDate?: string;
 }
 
 /** Resultado de uma verificacao individual. */
