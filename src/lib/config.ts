@@ -35,12 +35,16 @@ const DEFAULT_CHANNELS = [
   "ofertasdodia",
   "cupomdedesconto",
   "achadinhosshopee",
+  "cuponzeiros",
+  "ofertasrelampago",
+  "economizaai",
+  "ofertasdoluan",
 ];
 
 export const config = {
   enabledStores: enabled.length ? enabled : VALID_STORES,
   /** Intervalo da auto-coleta, em minutos. */
-  collectIntervalMin: intMin(process.env.COLLECT_INTERVAL_MIN, 10),
+  collectIntervalMin: intMin(process.env.COLLECT_INTERVAL_MIN, 5),
   /** Canais do Telegram para varrer (previa web t.me/s/<canal>). */
   telegramChannels: csvList(process.env.TELEGRAM_CHANNELS, DEFAULT_CHANNELS),
   headless: (process.env.HEADLESS || "true").toLowerCase() !== "false",

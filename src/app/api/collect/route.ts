@@ -14,7 +14,7 @@ let running = false;
  * Com ?ifStale=1 = so coleta se os dados estiverem velhos (usado pela auto-coleta).
  */
 export async function POST(req: Request) {
-  const intervalMin = Number(process.env.COLLECT_INTERVAL_MIN) || 10;
+  const intervalMin = Number(process.env.COLLECT_INTERVAL_MIN) || 5;
   const ifStale = new URL(req.url).searchParams.get("ifStale") === "1";
   if (ifStale && !isStale(intervalMin * 0.8 * 60_000)) {
     return NextResponse.json({ ok: true, skipped: true });

@@ -1,0 +1,13 @@
+# Blueprint para deploy gratuito no Render (https://render.com).
+# Importe este repositorio em "New > Blueprint" que ele le este arquivo.
+services:
+  - type: web
+    name: cupom-radar
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: COLLECT_INTERVAL_MIN
+        value: "5"

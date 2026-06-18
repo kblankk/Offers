@@ -11,7 +11,7 @@ export async function register() {
 
   const port = process.env.PORT || "3000";
   const base = `http://127.0.0.1:${port}`;
-  const intervalMin = Number(process.env.COLLECT_INTERVAL_MIN) || 10;
+  const intervalMin = Number(process.env.COLLECT_INTERVAL_MIN) || 5;
   const intervalMs = intervalMin * 60_000;
 
   async function trigger(reason: string, ifStale: boolean) {
