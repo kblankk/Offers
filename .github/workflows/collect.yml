@@ -1,23 +1,32 @@
-name: Coleta periodica (mantem cupons frescos 24/7)
+name: Coleta frequente (~2 min, 24/7)
 
-# Aciona /api/collect no app publicado a cada 5 min. Isso acorda a instancia
-# gratuita do Render (que dorme sem acesso) e coleta cupons novos mesmo sem
-# ninguem visitando o site — garantindo que peguemos os cupons com antecedencia.
+# O Render free dorme sem acesso e para a auto-coleta. Aqui acionamos
+# /api/collect com alta frequencia (loop a cada ~2 min) para manter os cupons
+# frescos o tempo todo — pegando os novos com antecedencia.
+#
+# Repo publico => minutos do Actions sao ilimitados (de graca).
+# 2 min e o equilibrio: rapido SEM arriscar bloqueio de IP nas fontes
+# (Cuponomia/Telegram). Para mudar a cadencia, ajuste o sleep abaixo.
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
-  workflow_dispatch: {} # permite rodar manualmente pela aba Actions
+    - cron: "*/5 * * * *" # o menor intervalo do agendador do GitHub
+  workflow_dispatch: {}
 
-# Evita execucoes sobrepostas.
 concurrency:
   group: coleta
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   collect:
     runs-on: ubuntu-latest
+    timeout-minutes: 6
     steps:
-      - name: Disparar coleta
+      - name: Acionar coleta em loop (~a cada 2 min)
         run: |
-          curl -fsS -X POST "https://offers-1gpo.onrender.com/api/collect" --max-time 150 || true
+          URL="https://offers-1gpo.onrender.com/api/collect"
+          for i in 1 2 3; do
+            echo "ping $i -> $URL"
+            curl -fsS -X POST "$URL" --max-time 150 || true
+            [ "$i" -lt 3 ] && sleep 120
+          done
