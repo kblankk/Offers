@@ -205,26 +205,45 @@ export function applyVerification(id: string, result: VerificationResult): void 
 }
 
 /**
- * Marca como expirados os cupons nao vistos em NENHUMA fonte ha mais de
- * `maxAgeMs`. Funciona de forma uniforme para todas as fontes (Cuponomia,
- * Telegram, etc.), ja que cada uma tem seu proprio ritmo de aparicao.
+ * Prazos de expiracao por fonte (ms). O prazo depende da fonte, porque cada uma
+ * tem ritmo diferente:
+ *  - Cuponomia (agregador) mantem uma lista "ativa" e atualiza a cada poucos
+ *    minutos. Se um cupom CAI dessa lista, provavelmente esgotou/expirou =>
+ *    expira rapido.
+ *  - Telegram sao posts esparsos (um cupom pode ser citado uma vez e nao voltar
+ *    a aparecer) => folga bem maior.
  */
-export function expireUnseen(maxAgeMs: number): number {
+export const EXPIRY_MS = {
+  aggregator: 3 * 60 * 60 * 1000,
+  other: 48 * 60 * 60 * 1000,
+} as const;
+
+/** Um cupom que sumiu da(s) fonte(s) ha tempo demais (segundo o prazo da fonte). */
+function isUnseenExpired(c: Coupon, now: number): boolean {
+  if (c.status === "expired") return false;
+  const isAggregator = (c.source ?? "").startsWith("cuponomia");
+  const maxAge = isAggregator ? EXPIRY_MS.aggregator : EXPIRY_MS.other;
+  return now - new Date(c.lastSeenAt).getTime() > maxAge;
+}
+
+/** Marca como expirados os cupons que sumiram das fontes ha tempo demais. */
+export function expireUnseen(): number {
   let n = 0;
   const now = Date.now();
   const nowIso = new Date().toISOString();
   for (const c of data.values()) {
-    if (c.status === "expired") continue;
-    if (now - new Date(c.lastSeenAt).getTime() > maxAgeMs) {
-      data.set(c.id, {
-        ...c,
-        status: "expired",
-        confidence: "high",
-        statusReason: "Nao aparece em nenhuma fonte ha um tempo (provavelmente expirou).",
-        lastCheckedAt: nowIso,
-      });
-      n++;
-    }
+    if (!isUnseenExpired(c, now)) continue;
+    const isAggregator = (c.source ?? "").startsWith("cuponomia");
+    data.set(c.id, {
+      ...c,
+      status: "expired",
+      confidence: "high",
+      statusReason: isAggregator
+        ? "Saiu da lista da fonte (provavelmente esgotou ou expirou)."
+        : "Nao aparece em nenhuma fonte ha um tempo (provavelmente expirou).",
+      lastCheckedAt: nowIso,
+    });
+    n++;
   }
   if (n) persist();
   return n;
@@ -245,7 +264,14 @@ export interface ListFilter {
 
 export function listCoupons(filter: ListFilter = {}): Coupon[] {
   reloadIfChanged();
-  let items = [...data.values()];
+  const now = Date.now();
+  // Guarda em tempo de leitura: cupons que sumiram da fonte ha tempo demais
+  // contam como expirados JA na exibicao (sem esperar a proxima coleta).
+  let items = [...data.values()].map((c) =>
+    isUnseenExpired(c, now)
+      ? { ...c, status: "expired" as const, statusReason: "Saiu da lista da fonte (provavelmente esgotou ou expirou)." }
+      : c,
+  );
   // Rede de seguranca: esconde deals de produto (preco "Por R$ ..." em vez de
   // um desconto), e cupons do Telegram cujo titulo e um produto concreto
   // (ex.: furadeira/TV) mesmo que tenham sido coletados antes do filtro.

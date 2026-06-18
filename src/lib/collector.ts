@@ -5,8 +5,6 @@ import { createLogger } from "./logger";
 
 const log = createLogger("collector");
 
-/** Cupons nao vistos em nenhuma fonte por mais de 48h sao marcados expirados. */
-const UNSEEN_EXPIRY_MS = 48 * 60 * 60 * 1000;
 
 export interface CollectSummary {
   collected: number;
@@ -52,7 +50,7 @@ export async function collectAll(): Promise<CollectSummary> {
     }
   }
 
-  summary.expiredCount = expireUnseen(UNSEEN_EXPIRY_MS);
+  summary.expiredCount = expireUnseen();
   summary.finishedAt = new Date().toISOString();
   log.info(
     `Coleta: ${summary.collected} cupons, ${summary.newCount} novos, ${summary.expiredCount} expirados, ${summary.errors.length} erros.`,
