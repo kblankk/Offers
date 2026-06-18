@@ -4,15 +4,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Azul eletrico como acento unico. */
-  --color-brand-50: #eef4ff;
-  --color-brand-100: #d9e6ff;
-  --color-brand-200: #b8d0ff;
-  --color-brand-300: #88b0ff;
-  --color-brand-400: #5b8bff;
-  --color-brand-500: #2f6bff;
-  --color-brand-600: #1d4ed8;
-  --color-brand-700: #1740b0;
+  /* Ciano/teal neon como acento unico. */
+  --color-brand-50: #ecfeff;
+  --color-brand-100: #cffafe;
+  --color-brand-200: #a5f3fc;
+  --color-brand-300: #67e8f9;
+  --color-brand-400: #22d3ee;
+  --color-brand-500: #06b6d4;
+  --color-brand-600: #0aa6c9;
+  --color-brand-700: #0e7490;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
@@ -24,7 +24,7 @@ html {
 body {
   /* off-white para os cards (brancos) elevarem com profundidade */
   background-color: #f5f6f8;
-  background-image: radial-gradient(55rem 26rem at 50% -7rem, rgba(47, 107, 255, 0.07), transparent 70%);
+  background-image: radial-gradient(55rem 26rem at 50% -7rem, rgba(6, 182, 212, 0.08), transparent 70%);
   background-attachment: fixed;
   color: #09090b;
   -webkit-font-smoothing: antialiased;
@@ -32,11 +32,42 @@ body {
   min-height: 100vh;
 }
 
+/* ===== Tema escuro: navy com brilho ciano/ambar borrado (pegada "tech glow") ===== */
 .dark body {
-  background-color: #08090c;
-  background-image: radial-gradient(55rem 26rem at 50% -7rem, rgba(47, 107, 255, 0.12), transparent 70%);
+  background-color: #060b13;
+  color: #e6edf6;
+  background-image:
+    /* glows suaves (borrado) */
+    radial-gradient(42rem 30rem at 16% 8%, rgba(13, 148, 161, 0.30), transparent 60%),
+    radial-gradient(40rem 28rem at 86% 14%, rgba(245, 158, 11, 0.13), transparent 60%),
+    radial-gradient(52rem 34rem at 50% 112%, rgba(34, 211, 238, 0.20), transparent 62%),
+    radial-gradient(30rem 24rem at 94% 86%, rgba(14, 116, 144, 0.22), transparent 60%),
+    /* grade fina estilo circuito */
+    linear-gradient(rgba(56, 189, 248, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.045) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 46px 46px, 46px 46px;
   background-attachment: fixed;
-  color: #fafafa;
+}
+
+/* Painel de "vidro": translucido + desfoque do fundo atras dele.
+   E aqui que o conteudo ganha o fundo borrado por baixo. */
+.dark .surface {
+  background-color: rgba(15, 23, 38, 0.55);
+  backdrop-filter: blur(14px) saturate(135%);
+  -webkit-backdrop-filter: blur(14px) saturate(135%);
+  border-color: rgba(56, 189, 248, 0.14);
+}
+/* Superficie interna (botoes/inputs dentro de um surface) */
+.dark .surface-2 {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Brilho neon em texto (logo, destaques). */
+.neon {
+  text-shadow:
+    0 0 16px rgba(34, 211, 238, 0.55),
+    0 0 36px rgba(34, 211, 238, 0.25);
 }
 
 /* Sombra premium em camadas para os cards */
@@ -48,17 +79,19 @@ body {
 .card-elev:hover {
   box-shadow:
     0 1px 2px rgba(16, 24, 40, 0.05),
-    0 18px 40px -14px rgba(29, 78, 216, 0.28);
+    0 18px 40px -14px rgba(6, 182, 212, 0.28);
 }
 .dark .card-elev {
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.4),
-    0 12px 30px -12px rgba(0, 0, 0, 0.6);
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 14px 34px -14px rgba(0, 0, 0, 0.7);
 }
 .dark .card-elev:hover {
+  border-color: rgba(34, 211, 238, 0.35);
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.4),
-    0 18px 44px -14px rgba(47, 107, 255, 0.35);
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(34, 211, 238, 0.18),
+    0 22px 50px -16px rgba(8, 145, 178, 0.5);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -90,6 +123,21 @@ body {
 }
 .animate-fade-in {
   animation: fade-in 0.35s ease-out both;
+}
+
+/* Pulso lento dos brilhos decorativos do hero */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+}
+.animate-glow {
+  animation: glow-pulse 7s ease-in-out infinite;
 }
 
 /* Faixa de codigos (kinetic typography) */

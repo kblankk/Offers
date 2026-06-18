@@ -22,10 +22,11 @@ export function FeaturedCoupon({ coupon }: { coupon: Coupon }) {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-950 p-6 text-white dark:border-zinc-800 sm:p-8">
+    <div className="relative overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#0a1322] p-6 text-white shadow-[0_0_0_1px_rgba(34,211,238,0.06),0_30px_60px_-30px_rgba(8,145,178,0.5)] sm:p-8">
       {/* brilho de fundo */}
-      <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-brand-600/40 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-brand-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-cyan-500/35 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-teal-500/25 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-16 right-1/3 h-40 w-40 rounded-full bg-amber-400/10 blur-3xl" />
 
       <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">

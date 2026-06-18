@@ -7,6 +7,7 @@ import { ProductChecker } from "@/components/ProductChecker";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CodeTicker } from "@/components/CodeTicker";
 import { FeaturedCoupon } from "@/components/FeaturedCoupon";
+import { Logo } from "@/components/Logo";
 import { STORE_META, type Coupon, type CouponStatus, type Store } from "@/lib/types";
 
 type StoreFilter = Store | "all";
@@ -107,12 +108,10 @@ export default function Home() {
   return (
     <>
       {/* Barra superior */}
-      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur dark:border-zinc-800 dark:bg-[#08090c]/85">
+      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur-xl dark:border-cyan-400/10 dark:bg-[#060b13]/70">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <div className="flex items-baseline gap-2">
-            <span className="display text-lg text-zinc-900 dark:text-white">ALLCUPOM</span>
-            <span className="h-2 w-2 rounded-full bg-brand-500" />
-          </div>
+          <Logo />
+
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
@@ -128,20 +127,27 @@ export default function Home() {
       </header>
 
       {/* Masthead editorial */}
-      <section className="mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
-        <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+      <section className="relative mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
+        {/* brilhos decorativos borrados (so no dark) */}
+        <div className="pointer-events-none absolute inset-0 -z-10 hidden overflow-visible dark:block">
+          <div className="animate-glow absolute -left-24 -top-10 h-72 w-72 rounded-full bg-cyan-500/25 blur-3xl" />
+          <div className="animate-glow absolute right-0 top-6 h-64 w-64 rounded-full bg-amber-400/15 blur-3xl [animation-delay:2s]" />
+          <div className="animate-glow absolute left-1/3 top-40 h-72 w-72 rounded-full bg-teal-500/20 blur-3xl [animation-delay:4s]" />
+        </div>
+
+        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/70 px-3 py-1 text-xs font-medium text-zinc-500 backdrop-blur dark:border-cyan-400/15 dark:bg-white/5 dark:text-zinc-300">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
           Atualização automática · {timeAgo(updatedAt)} · {stats.active ?? 0} cupons ativos
         </div>
-        <h1 className="display mt-4 text-5xl text-zinc-900 dark:text-white sm:text-7xl">
+        <h1 className="display mt-5 text-5xl text-zinc-900 dark:text-white sm:text-7xl">
           Economize
           <br />
-          <span className="text-brand-600 dark:text-brand-500">de verdade.</span>
+          <span className="text-brand-600 dark:text-brand-300 dark:neon">de verdade.</span>
         </h1>
-        <p className="mt-5 max-w-xl text-base text-zinc-600 dark:text-zinc-400">
+        <p className="mt-5 max-w-xl text-base text-zinc-600 dark:text-zinc-300/80">
           Cupons verificados de Mercado Livre, Amazon e Shopee — com código, desconto e status. Reunidos de
           agregadores e canais de Telegram, atualizados sozinhos.
         </p>
@@ -182,7 +188,7 @@ export default function Home() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar por loja, código ou desconto"
-              className="w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-9 text-sm outline-none transition placeholder:text-zinc-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+              className="surface-2 w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-9 text-sm outline-none transition placeholder:text-zinc-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/30 dark:text-zinc-100 dark:placeholder:text-zinc-500"
             />
             {query && (
               <button
@@ -288,8 +294,8 @@ function Chip({
       onClick={onClick}
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
         active
-          ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-          : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          ? "bg-zinc-900 text-white dark:bg-brand-400 dark:text-zinc-950 dark:shadow-[0_0_14px_-2px_rgba(34,211,238,0.7)]"
+          : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-cyan-400/15 dark:text-zinc-300 dark:hover:bg-white/5"
       }`}
     >
       {dot && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />}
@@ -304,7 +310,7 @@ function SkeletonGrid() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="h-56 animate-pulse rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+          className="surface h-56 animate-pulse rounded-2xl border border-zinc-200 bg-white dark:bg-transparent"
         />
       ))}
     </div>

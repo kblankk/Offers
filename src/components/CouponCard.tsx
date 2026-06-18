@@ -37,11 +37,11 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       : "text-brand-600 dark:text-brand-400";
 
   // cor dos recortes laterais = cor do fundo da pagina
-  const notch = "bg-[#f5f6f8] dark:bg-[#08090c]";
+  const notch = "bg-[#f5f6f8] dark:bg-[#060b13]";
 
   return (
     <div
-      className={`card-elev group relative flex h-full flex-col rounded-2xl border border-zinc-200/80 bg-white transition duration-200 hover:-translate-y-1 dark:border-zinc-800 dark:bg-zinc-900 ${
+      className={`card-elev surface group relative flex h-full flex-col rounded-2xl border border-zinc-200/80 bg-white transition duration-200 hover:-translate-y-1 dark:bg-transparent ${
         isExpired ? "opacity-55" : ""
       }`}
     >
@@ -114,7 +114,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
             <button
               onClick={copyCode}
               disabled={isExpired}
-              className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-lg bg-zinc-100 px-3 py-2.5 transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-800 dark:hover:bg-zinc-700/70"
+              className="surface-2 flex min-w-0 flex-1 items-center justify-between gap-2 rounded-lg bg-zinc-100 px-3 py-2.5 transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-white/10"
               title="Copiar código"
             >
               <span className="truncate font-mono text-sm font-semibold tracking-wider text-zinc-900 dark:text-zinc-100">

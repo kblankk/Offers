@@ -11,8 +11,8 @@ export const metadata: Metadata = {
     "Encontre cupons reais (código + %) de Mercado Livre, Amazon e Shopee. Status verificado, fontes citadas e atualização automática.",
 };
 
-// Tema padrao: claro. Respeita a escolha salva, sem flash.
-const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
+// Tema padrao: ESCURO (pegada neon). Respeita a escolha salva, sem flash.
+const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light')document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

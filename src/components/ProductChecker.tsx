@@ -79,7 +79,7 @@ export function ProductChecker() {
   const meta = product ? STORE_META[product.store] : null;
 
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <section className="surface rounded-2xl border border-zinc-200 bg-white p-5 dark:bg-transparent">
       <h2 className="text-base font-semibold text-zinc-900 dark:text-white">Tem um produto em mente?</h2>
       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
         Cole o link de um anúncio (Mercado Livre, Amazon ou Shopee) e veja quais cupons dá pra usar nele.
@@ -93,7 +93,7 @@ export function ProductChecker() {
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && check()}
             placeholder="https://www.mercadolivre.com.br/..."
-            className="w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-3 text-sm outline-none transition placeholder:text-zinc-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+            className="surface-2 w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-3 text-sm outline-none transition placeholder:text-zinc-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/30 dark:text-zinc-100 dark:placeholder:text-zinc-500"
           />
         </div>
         <button
