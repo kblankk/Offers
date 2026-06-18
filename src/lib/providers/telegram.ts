@@ -101,6 +101,13 @@ function extractTitle(lines: string[]): string {
   return "Cupom";
 }
 
+/**
+ * Posts mais antigos que isto sao IGNORADOS. A previa `t.me/s` mostra os ultimos
+ * ~20 posts (inclusive de dias atras); sem este corte, o scraper recoletaria
+ * posts velhos toda hora e manteria cupons ja esgotados eternamente "ativos".
+ */
+const MAX_POST_AGE_MS = 24 * 60 * 60 * 1000;
+
 async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawCoupon[]> {
   const url = `https://t.me/s/${channel}`;
   const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; CupomRadar/1)" } });
@@ -109,10 +116,24 @@ async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawC
     return [];
   }
   const html = await res.text();
-  const blocks = [...html.matchAll(/<div class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
+  // Captura o TEXTO do post + o datetime do post (que vem logo depois, no rodape
+  // da mensagem) para descartar posts antigos.
+  const blocks = [
+    ...html.matchAll(
+      /<div class="tgme_widget_message_text[^"]*"[^>]*>([\s\S]*?)<\/div>[\s\S]*?<time[^>]*datetime="([^"]+)"/g,
+    ),
+  ];
 
+  const now = Date.now();
+  let skippedOld = 0;
   const coupons: RawCoupon[] = [];
   for (const b of blocks) {
+    // descarta posts antigos (cupom velho costuma estar esgotado/expirado)
+    const postedAt = Date.parse(b[2] ?? "");
+    if (Number.isFinite(postedAt) && now - postedAt > MAX_POST_AGE_MS) {
+      skippedOld++;
+      continue;
+    }
     const text = unescapeHtml(b[1]!).trim();
     const code = extractCode(text);
     if (!code) continue; // so posts com codigo de cupom
@@ -151,7 +172,7 @@ async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawC
       expiresAt: null,
     });
   }
-  ctx.log.info(`Telegram @${channel}: ${coupons.length} cupons com codigo.`);
+  ctx.log.info(`Telegram @${channel}: ${coupons.length} cupons com codigo (${skippedOld} posts antigos ignorados).`);
   return coupons;
 }
 

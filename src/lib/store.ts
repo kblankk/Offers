@@ -215,7 +215,7 @@ export function applyVerification(id: string, result: VerificationResult): void 
  */
 export const EXPIRY_MS = {
   aggregator: 3 * 60 * 60 * 1000,
-  other: 48 * 60 * 60 * 1000,
+  other: 12 * 60 * 60 * 1000,
 } as const;
 
 /** Um cupom que sumiu da(s) fonte(s) ha tempo demais (segundo o prazo da fonte). */
