@@ -36,22 +36,19 @@ body {
   overflow-x: clip;
 }
 
-/* ===== Tema escuro: fundo escuro limpo, sem cores nem grade ===== */
+/* ===== Tema escuro: preto, limpo, sem cores nem grade ===== */
 .dark body {
-  background-color: #0a0e16;
-  color: #e6edf6;
-  /* leve profundidade no topo (neutro, sem cor) */
-  background-image: radial-gradient(60rem 30rem at 50% -10rem, rgba(255, 255, 255, 0.03), transparent 70%);
+  background-color: #000000;
+  color: #e8eaed;
   background-attachment: fixed;
 }
 
-/* Painel de "vidro": translucido + desfoque do fundo atras dele.
-   E aqui que o conteudo ganha o fundo borrado por baixo. */
+/* Painel de "vidro": translucido + desfoque do fundo atras dele. */
 .dark .surface {
-  background-color: rgba(15, 23, 38, 0.55);
-  backdrop-filter: blur(14px) saturate(135%);
-  -webkit-backdrop-filter: blur(14px) saturate(135%);
-  border-color: rgba(56, 189, 248, 0.14);
+  background-color: rgba(22, 22, 24, 0.6);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 /* Superficie interna (botoes/inputs dentro de um surface) */
 .dark .surface-2 {

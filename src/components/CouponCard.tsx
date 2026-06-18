@@ -56,7 +56,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       : "text-brand-600 dark:text-brand-400";
 
   // cor dos recortes laterais = cor do fundo da pagina
-  const notch = "bg-[#f5f6f8] dark:bg-[#0a0e16]";
+  const notch = "bg-[#f5f6f8] dark:bg-[#000000]";
 
   return (
     <div

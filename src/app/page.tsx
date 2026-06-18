@@ -123,7 +123,7 @@ export default function Home() {
         >
           {/* leve escurecimento no topo (nav legivel) e base fundindo no fundo */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#0a0e16] to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#000000] to-transparent" />
 
           {/* barra de navegacao sobre a imagem */}
           <div className="absolute inset-x-0 top-0 z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
@@ -156,7 +156,7 @@ export default function Home() {
 
           {/* Texto do hero no lado direito (desktop), sobre a imagem */}
           <div className="absolute inset-y-0 left-0 z-10 hidden w-[50%] items-end md:flex lg:w-[46%]">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a0e16]/90 via-black/45 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#000000]/90 via-black/45 to-transparent" />
             <div className="relative px-8 pb-12 lg:px-14 lg:pb-16">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
                 <span className="relative flex h-2 w-2">
