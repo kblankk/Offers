@@ -123,7 +123,7 @@ export default function Home() {
         >
           {/* leve escurecimento no topo (nav legivel) e base fundindo no fundo */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#060b13] to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#0a0e16] to-transparent" />
 
           {/* barra de navegacao sobre a imagem */}
           <div className="absolute inset-x-0 top-0 z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
@@ -156,7 +156,7 @@ export default function Home() {
 
           {/* Texto do hero no lado direito (desktop), sobre a imagem */}
           <div className="absolute inset-y-0 left-0 z-10 hidden w-[50%] items-end md:flex lg:w-[46%]">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#060b13]/90 via-black/45 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a0e16]/90 via-black/45 to-transparent" />
             <div className="relative px-8 pb-12 lg:px-14 lg:pb-16">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
                 <span className="relative flex h-2 w-2">
@@ -181,13 +181,6 @@ export default function Home() {
 
       {/* Masthead editorial — so no mobile (no desktop o texto fica sobre a imagem) */}
       <section className="relative mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16 md:hidden">
-        {/* brilhos decorativos borrados (so no dark) */}
-        <div className="pointer-events-none absolute inset-0 -z-10 hidden overflow-visible dark:block">
-          <div className="animate-glow absolute -left-24 -top-10 h-72 w-72 rounded-full bg-cyan-500/25 blur-3xl" />
-          <div className="animate-glow absolute right-4 top-2 h-64 w-64 rounded-full bg-fuchsia-500/20 blur-3xl [animation-delay:2s]" />
-          <div className="animate-glow absolute left-1/3 top-44 h-72 w-72 rounded-full bg-teal-500/18 blur-3xl [animation-delay:4s]" />
-        </div>
-
         <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/70 px-3 py-1 text-xs font-medium text-zinc-500 backdrop-blur dark:border-cyan-400/15 dark:bg-white/5 dark:text-zinc-300">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
