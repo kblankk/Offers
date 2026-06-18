@@ -232,8 +232,50 @@ export default function Home() {
             )}
           </div>
 
-          {/* Filtros: no mobile rolam na horizontal (não quebram em várias fileiras) */}
-          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar sm:mx-0 sm:flex-wrap sm:px-0">
+          {/* MOBILE: menus suspensos compactos (nada cortado) */}
+          <div className="flex flex-col gap-2 sm:hidden">
+            <div className="flex gap-2">
+              <select
+                value={store}
+                onChange={(e) => setStore(e.target.value as StoreFilter)}
+                aria-label="Filtrar por loja"
+                className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-700 outline-none focus:border-brand-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+              >
+                <option value="all">Todas as lojas</option>
+                {(Object.keys(STORE_META) as Store[]).map((s) => (
+                  <option key={s} value={s}>
+                    {STORE_META[s].label}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as StatusFilter)}
+                aria-label="Filtrar por status"
+                className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-700 outline-none focus:border-brand-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+              >
+                {STATUS_TABS.map((t) => (
+                  <option key={t.key} value={t.key}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={() => setTrusted((v) => !v)}
+              className={`inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                trusted
+                  ? "bg-emerald-600 text-white"
+                  : "border border-zinc-200 text-zinc-600 dark:border-zinc-800 dark:text-zinc-300"
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              {trusted ? "Só confiáveis (ativado)" : "Mostrar todos"}
+            </button>
+          </div>
+
+          {/* DESKTOP: chips */}
+          <div className="hidden flex-wrap items-center gap-2 sm:flex">
             <Chip active={store === "all"} onClick={() => setStore("all")}>
               Todas as lojas
             </Chip>
@@ -242,16 +284,16 @@ export default function Home() {
                 {STORE_META[s].label}
               </Chip>
             ))}
-          </div>
-          <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 no-scrollbar sm:mx-0 sm:flex-wrap sm:px-0">
+            <span className="mx-1 h-5 w-px bg-zinc-200 dark:bg-zinc-800" />
             {STATUS_TABS.map((t) => (
               <Chip key={t.key} active={status === t.key} onClick={() => setStatus(t.key)}>
                 {t.label}
               </Chip>
             ))}
+            <span className="mx-1 h-5 w-px bg-zinc-200 dark:bg-zinc-800" />
             <button
               onClick={() => setTrusted((v) => !v)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
                 trusted
                   ? "bg-emerald-600 text-white"
                   : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
