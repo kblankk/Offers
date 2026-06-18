@@ -114,66 +114,74 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero em banner (imagem de referencia) ocupando boa parte da tela */}
-      <header className="relative flex min-h-[85vh] w-full flex-col overflow-hidden">
-        {/* imagem de fundo */}
+      {/* Header em banner: a imagem de referencia INTEIRA (caixa na proporcao
+          exata da foto => mostra a imagem toda, sem corte). */}
+      <header className="relative w-full overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="relative aspect-[2752/1536] w-full bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/header.jpg')" }}
-        />
-        {/* scrims: escurece a esquerda (legibilidade do texto) e funde a base no fundo */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-black/10" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#060b13] via-black/50 to-transparent" />
+        >
+          {/* leve escurecimento no topo (nav legivel) e base fundindo no fundo */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#060b13] to-transparent" />
 
-        {/* barra de navegacao sobre a imagem */}
-        <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
-          <Logo light />
+          {/* barra de navegacao sobre a imagem */}
+          <div className="absolute inset-x-0 top-0 z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+            <Logo light />
 
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
-            {NAV.map((n) => (
-              <a
-                key={n.href}
-                href={n.href}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-white/80 drop-shadow transition hover:bg-white/10 hover:text-white"
+            <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
+              {NAV.map((n) => (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-white/80 drop-shadow transition hover:bg-white/10 hover:text-white"
+                >
+                  {n.label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={refresh}
+                disabled={collecting}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white shadow-[0_0_18px_-4px_rgba(34,211,238,0.7)] transition hover:bg-brand-700 disabled:opacity-60"
               >
-                {n.label}
-              </a>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <button
-              onClick={refresh}
-              disabled={collecting}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white shadow-[0_0_18px_-4px_rgba(34,211,238,0.7)] transition hover:bg-brand-700 disabled:opacity-60"
-            >
-              <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">Atualizar</span>
-            </button>
+                <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
+                <span className="hidden sm:inline">Atualizar</span>
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* conteudo do hero, sobre a imagem */}
-        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-4 pb-24 pt-8 sm:px-6">
-          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            Atualização automática · {timeAgo(updatedAt)} · {stats.active ?? 0} cupons ativos
-          </div>
-          <h1 className="display mt-6 text-6xl text-white sm:text-8xl">
-            Economize
-            <br />
-            <span className="neon text-brand-300">de verdade.</span>
-          </h1>
-          <p className="mt-6 max-w-xl text-base text-white/85 sm:text-lg">
-            Cupons verificados de Mercado Livre, Amazon e Shopee — com código, desconto e status. Reunidos de
-            agregadores e canais de Telegram, atualizados sozinhos.
-          </p>
         </div>
       </header>
+
+      {/* Masthead editorial (logo abaixo da imagem) */}
+      <section className="relative mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
+        {/* brilhos decorativos borrados (so no dark) */}
+        <div className="pointer-events-none absolute inset-0 -z-10 hidden overflow-visible dark:block">
+          <div className="animate-glow absolute -left-24 -top-10 h-72 w-72 rounded-full bg-cyan-500/25 blur-3xl" />
+          <div className="animate-glow absolute right-4 top-2 h-64 w-64 rounded-full bg-fuchsia-500/20 blur-3xl [animation-delay:2s]" />
+          <div className="animate-glow absolute left-1/3 top-44 h-72 w-72 rounded-full bg-teal-500/18 blur-3xl [animation-delay:4s]" />
+        </div>
+
+        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/70 px-3 py-1 text-xs font-medium text-zinc-500 backdrop-blur dark:border-cyan-400/15 dark:bg-white/5 dark:text-zinc-300">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          </span>
+          Atualização automática · {timeAgo(updatedAt)} · {stats.active ?? 0} cupons ativos
+        </div>
+        <h1 className="display mt-5 text-5xl text-zinc-900 dark:text-white sm:text-7xl">
+          Economize
+          <br />
+          <span className="text-brand-600 dark:text-brand-300 dark:neon">de verdade.</span>
+        </h1>
+        <p className="mt-5 max-w-xl text-base text-zinc-600 dark:text-zinc-300/80">
+          Cupons verificados de Mercado Livre, Amazon e Shopee — com código, desconto e status. Reunidos de
+          agregadores e canais de Telegram, atualizados sozinhos.
+        </p>
+      </section>
 
       {/* Destaque */}
       {featured && (
