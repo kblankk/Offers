@@ -245,6 +245,9 @@ export interface ListFilter {
 export function listCoupons(filter: ListFilter = {}): Coupon[] {
   reloadIfChanged();
   let items = [...data.values()];
+  // Rede de seguranca: esconde deals de produto (preco "Por R$ ..." em vez de
+  // um desconto). So mostramos cupons de verdade (% OFF ou R$ OFF).
+  items = items.filter((c) => !/^por\b/i.test(c.discountText ?? ""));
   if (filter.store) items = items.filter((c) => c.store === filter.store);
   if (filter.status) items = items.filter((c) => c.status === filter.status);
   if (filter.trustedOnly) items = items.filter((c) => c.confidence === "high");

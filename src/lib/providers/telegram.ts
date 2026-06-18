@@ -47,13 +47,15 @@ function extractCode(text: string): string | null {
   const m = text.match(/(?:cupom|c[oó]digo|voucher|cod\.?)\s*:?\s*([A-Z0-9][A-Z0-9._-]{3,24})/i);
   if (!m) return null;
   const raw = m[1]!.toUpperCase().replace(/[._-]+$/, "");
-  // Evita capturar palavras comuns / nomes de loja como se fossem codigo.
+  // Evita capturar palavras comuns / nomes de loja / URLs como se fossem codigo.
   const BLOCK = new Set([
     "AQUI", "LINK", "HOJE", "AGORA", "GRATIS", "OFF", "AMAZON", "SHOPEE", "MERCADO",
     "LIVRE", "MELI", "DESCONTO", "DESCONTOS", "PROMO", "PROMOCAO", "OFERTA", "OFERTAS",
     "CUPOM", "CUPONS", "CODIGO", "VOUCHER", "FRETE", "REAIS", "COMPRE", "GANHE", "LOJA", "SITE",
+    "HTTP", "HTTPS", "WWW", "COM", "PARA", "VALE", "ABAIXO", "PRECO", "PRECINHO",
   ]);
   if (BLOCK.has(raw)) return null;
+  if (/^HTTP/.test(raw)) return null; // qualquer coisa de URL
   // Bom codigo: tem ao menos um digito OU >=5 chars maiusculos.
   if (!/[0-9]/.test(raw) && raw.length < 5) return null;
   return raw;
@@ -90,9 +92,21 @@ async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawC
   for (const b of blocks) {
     const text = unescapeHtml(b[1]!).trim();
     const code = extractCode(text);
-    if (!code) continue; // so nos interessam posts com codigo de cupom
+    if (!code) continue; // so posts com codigo de cupom
     const store = detectStore(text);
     if (!store) continue;
+
+    // QUEREMOS SO CUPONS LIMPOS, nao deals de produto.
+    // Deal de produto costuma trazer um PRECO ("POR R$ 61", "1349 reais",
+    // "de R$X por R$Y"). Cupom de verdade traz um DESCONTO (% OFF ou R$ OFF).
+    const discount = parseDiscountText(text);
+    const hasRealDiscount = !!discount && /%|off/i.test(discount);
+    const looksLikeProductPrice =
+      /\bpor\b\s*:?\s*r?\$?\s*\d/i.test(text) ||
+      /\d+\s*reais/i.test(text) ||
+      /de\s*r\$\s*[\d.,]+\s*por/i.test(text);
+    if (!hasRealDiscount || looksLikeProductPrice) continue;
+
     const lines = text.split("\n");
     const title = extractTitle(lines);
     const { scope, general } = parseScope(`${title} ${text}`, false);
@@ -103,7 +117,7 @@ async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawC
       title,
       description: text.replace(/\n+/g, " ").slice(0, 180),
       url: extractUrl(text) ?? url,
-      discountText: parseDiscountText(text),
+      discountText: discount,
       minPurchase: parseMinPurchase(text),
       scope,
       scopeGeneral: general,
