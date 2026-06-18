@@ -30,3 +30,6 @@ _shot.mjs
 
 # imagens-fonte (originais pesados)
 references/
+
+# segredo: deploy hook do Render (NUNCA commitar)
+.render-hook
