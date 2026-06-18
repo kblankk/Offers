@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Search, RefreshCw, Ticket, ShieldCheck, X, Radar } from "lucide-react";
 import { CouponCard } from "@/components/CouponCard";
+import { ProductChecker } from "@/components/ProductChecker";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { STORE_META, type Coupon, type CouponStatus, type Store } from "@/lib/types";
 
@@ -134,6 +135,11 @@ export default function Home() {
             realmente funcionam — com código, desconto e onde valem.
           </p>
         </header>
+
+        {/* Checador de produto */}
+        <div className="mt-8">
+          <ProductChecker />
+        </div>
 
         {/* Stats */}
         <section className="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
