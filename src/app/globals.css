@@ -19,6 +19,9 @@
 
 html {
   scroll-behavior: smooth;
+  /* Impede rolagem horizontal causada pelos brilhos decorativos (glows) que
+     "vazam" para fora da tela no mobile. `clip` nao quebra o header sticky. */
+  overflow-x: clip;
 }
 
 body {
@@ -30,6 +33,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   min-height: 100vh;
+  overflow-x: clip;
 }
 
 /* ===== Tema escuro: navy com brilho ciano/ambar borrado (pegada "tech glow") ===== */
