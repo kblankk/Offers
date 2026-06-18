@@ -61,8 +61,13 @@ function persist(): void {
 
 load();
 
+/**
+ * Chave estavel. Quando ha codigo, deduplica por loja+codigo (mesmo cupom de
+ * fontes diferentes vira um so). Sem codigo (oferta), usa a URL.
+ */
 export function couponId(store: Store, code: string | null, url: string): string {
-  return createHash("sha1").update(`${store}|${code ?? ""}|${url}`).digest("hex").slice(0, 16);
+  const basis = code ? `${store}|code|${code.toUpperCase()}` : `${store}|url|${url}`;
+  return createHash("sha1").update(basis).digest("hex").slice(0, 16);
 }
 
 /**
@@ -118,6 +123,7 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
       minPurchase: raw.minPurchase ?? existing.minPurchase,
       scope: raw.scope ?? existing.scope,
       scopeGeneral: raw.scopeGeneral ?? existing.scopeGeneral,
+      source: raw.source ?? existing.source,
       kind: raw.kind,
       expiresAt: raw.expiresAt ?? existing.expiresAt,
       status: draining ? "suspected_exhausted" : "active",
@@ -151,6 +157,7 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
     minPurchase: raw.minPurchase,
     scope: raw.scope,
     scopeGeneral: raw.scopeGeneral,
+    source: raw.source,
     expiresAt: raw.expiresAt ?? null,
     status: "active",
     confidence,
@@ -181,23 +188,23 @@ export function applyVerification(id: string, result: VerificationResult): void 
 }
 
 /**
- * Marca como expirados os cupons de uma loja que NAO foram vistos nesta coleta
- * (lastSeenAt anterior ao inicio da coleta). Sair da lista da fonte e o sinal
- * mais confiavel de que um cupom acabou/expirou.
+ * Marca como expirados os cupons nao vistos em NENHUMA fonte ha mais de
+ * `maxAgeMs`. Funciona de forma uniforme para todas as fontes (Cuponomia,
+ * Telegram, etc.), ja que cada uma tem seu proprio ritmo de aparicao.
  */
-export function markStaleAsExpired(store: Store, runStartedAt: string): number {
+export function expireUnseen(maxAgeMs: number): number {
   let n = 0;
-  const now = new Date().toISOString();
+  const now = Date.now();
+  const nowIso = new Date().toISOString();
   for (const c of data.values()) {
-    if (c.store !== store) continue;
     if (c.status === "expired") continue;
-    if (c.lastSeenAt < runStartedAt) {
+    if (now - new Date(c.lastSeenAt).getTime() > maxAgeMs) {
       data.set(c.id, {
         ...c,
         status: "expired",
         confidence: "high",
-        statusReason: "Saiu da lista da fonte (provavelmente expirou/esgotou).",
-        lastCheckedAt: now,
+        statusReason: "Nao aparece em nenhuma fonte ha um tempo (provavelmente expirou).",
+        lastCheckedAt: nowIso,
       });
       n++;
     }

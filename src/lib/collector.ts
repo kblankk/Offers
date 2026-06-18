@@ -1,26 +1,26 @@
-import { enabledProviders } from "./providers/index";
-import { markStaleAsExpired, upsertCoupon } from "./store";
+import { allSources } from "./providers/index";
+import { expireUnseen, upsertCoupon } from "./store";
 import type { Coupon } from "./types";
 import { createLogger } from "./logger";
 
 const log = createLogger("collector");
+
+/** Cupons nao vistos em nenhuma fonte por mais de 48h sao marcados expirados. */
+const UNSEEN_EXPIRY_MS = 48 * 60 * 60 * 1000;
 
 export interface CollectSummary {
   collected: number;
   newCount: number;
   expiredCount: number;
   newCoupons: Coupon[];
-  errors: { store: string; message: string }[];
+  errors: { source: string; message: string }[];
+  bySource: Record<string, number>;
   finishedAt: string;
 }
 
 /**
- * Roda todos os provedores habilitados. Para cada loja:
- *  1. coleta a lista atual de cupons e marca como ativos (upsert);
- *  2. marca como expirados os cupons daquela loja que sairam da lista.
- *
- * Ou seja, cada coleta JA e uma verificacao de validade — a fonte de verdade
- * e a propria lista de cupons no agregador.
+ * Roda TODAS as fontes (Cuponomia por loja + canais de Telegram), faz upsert
+ * (deduplicando por codigo entre fontes) e expira o que sumiu ha tempo demais.
  */
 export async function collectAll(): Promise<CollectSummary> {
   const summary: CollectSummary = {
@@ -29,13 +29,14 @@ export async function collectAll(): Promise<CollectSummary> {
     expiredCount: 0,
     newCoupons: [],
     errors: [],
+    bySource: {},
     finishedAt: "",
   };
 
-  for (const provider of enabledProviders()) {
-    const runStartedAt = new Date().toISOString();
+  for (const source of allSources()) {
     try {
-      const raws = await provider.collect({ log });
+      const raws = await source.collect({ log });
+      summary.bySource[source.name] = raws.length;
       for (const raw of raws) {
         const { coupon, isNew } = upsertCoupon(raw);
         summary.collected++;
@@ -44,17 +45,14 @@ export async function collectAll(): Promise<CollectSummary> {
           summary.newCoupons.push(coupon);
         }
       }
-      // So expira por ausencia se a coleta trouxe algo (evita zerar tudo num bloqueio).
-      if (raws.length > 0) {
-        summary.expiredCount += markStaleAsExpired(provider.store, runStartedAt);
-      }
     } catch (err) {
       const message = (err as Error).message;
-      log.error(`Provedor ${provider.label} falhou: ${message}`);
-      summary.errors.push({ store: provider.store, message });
+      log.error(`Fonte ${source.name} falhou: ${message}`);
+      summary.errors.push({ source: source.name, message });
     }
   }
 
+  summary.expiredCount = expireUnseen(UNSEEN_EXPIRY_MS);
   summary.finishedAt = new Date().toISOString();
   log.info(
     `Coleta: ${summary.collected} cupons, ${summary.newCount} novos, ${summary.expiredCount} expirados, ${summary.errors.length} erros.`,

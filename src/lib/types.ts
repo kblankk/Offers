@@ -42,6 +42,8 @@ export interface RawCoupon {
   scope?: string;
   /** true se vale no site inteiro (geral); false se restrito a categoria/itens. */
   scopeGeneral?: boolean;
+  /** De onde o cupom veio (ex.: "cuponomia", "telegram:economizandocomjp"). */
+  source?: string;
   /** Data de expiracao, se conhecida (ISO 8601). */
   expiresAt?: string | null;
 }

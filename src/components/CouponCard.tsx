@@ -6,6 +6,12 @@ import { StatusBadge } from "./StatusBadge";
 import { StoreLogo } from "./StoreLogo";
 import { STORE_META, type Coupon } from "@/lib/types";
 
+function sourceLabel(source: string): string {
+  if (source.startsWith("telegram:")) return `via Telegram @${source.slice("telegram:".length)}`;
+  if (source === "cuponomia") return "via Cuponomia";
+  return `via ${source}`;
+}
+
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diff / 60000);
@@ -59,6 +65,8 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
             </p>
             <p className="flex items-center gap-1 text-xs text-slate-400">
               <Clock className="h-3 w-3" /> visto {timeAgo(coupon.lastSeenAt)}
+              {coupon.source && <span className="text-slate-300">·</span>}
+              {coupon.source && <span>{sourceLabel(coupon.source)}</span>}
             </p>
           </div>
         </div>

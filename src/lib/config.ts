@@ -20,10 +20,20 @@ function intMin(value: string | undefined, fallback: number): number {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
+function csvList(value: string | undefined, fallback: string[]): string[] {
+  const list = csv(value);
+  return list.length ? list : fallback;
+}
+
+// Canais publicos de cupom no Telegram (sobrescreva com TELEGRAM_CHANNELS).
+const DEFAULT_CHANNELS = ["economizandocomjp", "pechinchou", "promobit", "cuponomia"];
+
 export const config = {
   enabledStores: enabled.length ? enabled : VALID_STORES,
   /** Intervalo da auto-coleta, em minutos. */
-  collectIntervalMin: intMin(process.env.COLLECT_INTERVAL_MIN, 30),
+  collectIntervalMin: intMin(process.env.COLLECT_INTERVAL_MIN, 10),
+  /** Canais do Telegram para varrer (previa web t.me/s/<canal>). */
+  telegramChannels: csvList(process.env.TELEGRAM_CHANNELS, DEFAULT_CHANNELS),
   headless: (process.env.HEADLESS || "true").toLowerCase() !== "false",
   dbPath: process.env.DB_PATH || "./data/coupons.json",
 } as const;

@@ -12,6 +12,9 @@ armazenamento local em JSON. Nenhum serviço pago, nenhuma compilação nativa.
 ---
 
 ## ✨ Funcionalidades
+- 📡 **Múltiplas fontes**: agregador (Cuponomia) + **canais públicos do Telegram**
+  (`t.me/s/<canal>`) — pega cupons recém-postados, muitas vezes antes dos agregadores.
+- 🔁 **Deduplicação por código**: o mesmo cupom vindo de fontes diferentes vira um só.
 - 🔎 **Busca** por loja, código ou desconto.
 - 🏷️ **Filtros** por loja e por status (ativos, suspeitos, expirados, todos).
 - 📋 **Copiar código** com um clique.
@@ -71,8 +74,9 @@ src/
     browser.ts               #   Playwright (Chromium)
     collector.ts             #   orquestra coleta + expiração
     providers/
-      cuponomia.ts           #   raspador da fonte de cupons (código + %)
-      index.ts               #   mapeia cada loja -> slug da fonte
+      cuponomia.ts           #   raspador do agregador (código + %)
+      telegram.ts            #   raspa canais públicos (t.me/s/<canal>)
+      index.ts               #   reúne todas as fontes (allSources)
   scripts/
     worker.ts                #   coleta periódica (cron)
     collect-once.ts          #   coleta única (debug)
