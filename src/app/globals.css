@@ -56,6 +56,19 @@ body {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
+/* Borda serrilhada (zigue-zague) em cima e embaixo — efeito de cupom de papel
+   rasgado. O drop-shadow segue o recorte. */
+.ticket-serrated {
+  --sz: 16px;
+  -webkit-mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--sz) 50.5% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--sz) 50.5% repeat-x;
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--sz) 50.5% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--sz) 50.5% repeat-x;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.22));
+}
+
 /* Brilho neon em texto (logo, destaques). */
 .neon {
   text-shadow:
