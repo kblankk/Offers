@@ -1,4 +1,4 @@
-# Publicar o Cupom Radar de graça 🚀
+# Publicar o AllCupom de graça 🚀
 
 O app tem duas partes que afetam a hospedagem:
 - **Site (Next.js)** — roda em qualquer lugar.

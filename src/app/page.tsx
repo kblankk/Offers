@@ -110,7 +110,7 @@ export default function Home() {
       <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur dark:border-zinc-800 dark:bg-[#08090c]/85">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex items-baseline gap-2">
-            <span className="display text-lg text-zinc-900 dark:text-white">CUPOM RADAR</span>
+            <span className="display text-lg text-zinc-900 dark:text-white">ALLCUPOM</span>
             <span className="h-2 w-2 rounded-full bg-brand-500" />
           </div>
           <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export default function Home() {
             <span className="font-medium text-zinc-700 dark:text-zinc-200">Kawã Crispim de Oliveira</span>
           </p>
           <p className="text-xs text-zinc-400 dark:text-zinc-500">
-            Cupom Radar · {new Date().getFullYear()}
+            AllCupom · {new Date().getFullYear()}
           </p>
         </div>
       </footer>

@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const display = Archivo({ subsets: ["latin"], variable: "--font-display", weight: ["600", "700", "800", "900"] });
 
 export const metadata: Metadata = {
-  title: "Cupom Radar — cupons verificados de Mercado Livre, Amazon e Shopee",
+  title: "AllCupom — cupons verificados de Mercado Livre, Amazon e Shopee",
   description:
     "Encontre cupons reais (código + %) de Mercado Livre, Amazon e Shopee. Status verificado, fontes citadas e atualização automática.",
 };

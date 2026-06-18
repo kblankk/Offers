@@ -1,4 +1,4 @@
-# Imagem para rodar o Cupom Radar (Next.js) em qualquer host com Docker
+# Imagem para rodar o AllCupom (Next.js) em qualquer host com Docker
 # (Render, Fly.io, Railway, VPS...). Leve: sem navegador — a coleta usa fetch.
 FROM node:22-bookworm-slim
 

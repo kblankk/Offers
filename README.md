@@ -1,4 +1,4 @@
-# Cupom Radar 🎟️
+# AllCupom 🎟️
 
 Aplicação **web** para descobrir, buscar e verificar **cupons reais** (código + %) de
 **Mercado Livre**, **Amazon** e **Shopee**. Mostra quais estão **ativos**, **expirados**
