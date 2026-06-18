@@ -56,6 +56,7 @@ export async function collectFromCuponomia(
         image: string;
         status: string[];
         exclusive: boolean;
+        storeWide: boolean;
       }[] = [];
       for (const el of items) {
         const id = el.getAttribute("data-id") ?? "";
@@ -69,8 +70,9 @@ export async function collectFromCuponomia(
           (s) => (s.textContent ?? "").trim(),
         );
         const exclusive = /\bexclusiv/i.test((el as HTMLElement).innerText || "");
+        const storeWide = el.getAttribute("data-is-store-wide") === "true";
         if (id && (title || discount))
-          out.push({ id, type, code, discount, title, desc, image, status, exclusive });
+          out.push({ id, type, code, discount, title, desc, image, status, exclusive, storeWide });
       }
       return out;
     });
@@ -90,6 +92,53 @@ export async function collectFromCuponomia(
       if (!m) return undefined;
       const n = Number(m[1]!.replace(/\./g, ""));
       return Number.isFinite(n) && n > 0 ? n : undefined;
+    };
+
+    const norm = (s: string) =>
+      s.toLowerCase().normalize("NFD").replace(new RegExp(`[${String.fromCharCode(0x0300)}-${String.fromCharCode(0x036f)}]`, "g"), "");
+
+    // Categorias reconhecidas a partir do titulo/descricao.
+    // OBS: nao usar "mercado" sozinho (casaria com a loja "Mercado Livre").
+    const CATEGORIES: { label: string; re: RegExp }[] = [
+      { label: "Produtos internacionais", re: /internaciona|importad/ },
+      { label: "Moda", re: /\bmoda\b|vestuario|roupa|calcado|tenis|sapato|fashion/ },
+      { label: "Beleza", re: /beleza|perfum|cosmetic|maquiagem|skincare/ },
+      { label: "Eletrônicos", re: /eletronic|celular|smartphone|informatica|notebook|\btv\b|tecnolog|console|games?\b/ },
+      { label: "Casa", re: /\bcasa\b|movei|decora|eletrodomestic|cozinha/ },
+      { label: "Supermercado", re: /supermercado|hortifruti|mercearia|alimento|bebida|grocer/ },
+      { label: "Pet", re: /\bpet\b|petshop/ },
+      { label: "Bebês/Infantil", re: /bebe|infantil|crianca|brinquedo/ },
+      { label: "Esporte", re: /esporte|fitness|academia/ },
+      { label: "Farmácia/Saúde", re: /farmacia|medicament/ },
+      { label: "Livros", re: /\blivro|\bbook/ },
+    ];
+
+    // Determina onde o cupom vale, de forma legivel.
+    const parseScope = (
+      text: string,
+      storeWide: boolean,
+    ): { scope: string; general: boolean } => {
+      // Remove o nome da loja para nao confundir com categoria.
+      const t = norm(text).replace(/mercado livre|mercadolivre|amazon|shopee/g, " ");
+      const cats = CATEGORIES.filter((c) => c.re.test(t)).map((c) => c.label);
+      const selected = /selecionad/.test(t);
+      const firstBuy = /primeira compra|1a compra|novos clientes|novos usuarios/.test(t);
+      const inApp = /\bno app\b|pelo app|aplicativo/.test(t);
+      const freeShip = /frete gratis/.test(t);
+
+      const parts: string[] = [];
+      if (cats.length) parts.push(...cats);
+      else if (storeWide) parts.push("Site todo");
+      else if (selected) parts.push("Itens selecionados");
+      else parts.push("Geral");
+
+      if (selected && cats.length) parts.push("selecionados");
+      if (firstBuy) parts.push("1ª compra");
+      if (inApp) parts.push("no app");
+      if (freeShip) parts.push("frete grátis");
+
+      const general = cats.length === 0 && !selected && !firstBuy && (storeWide || parts[0] === "Geral");
+      return { scope: parts.join(" · "), general };
     };
 
     // Alguns "codigos" sao na verdade placeholders ("Ative o cupom no link"),
@@ -120,6 +169,10 @@ export async function collectFromCuponomia(
         usesToday: parseUses(r.status),
         exclusive: r.exclusive,
         minPurchase: parseMin(`${r.desc} ${r.title}`),
+        ...(() => {
+          const s = parseScope(`${r.title} ${r.desc}`, r.storeWide);
+          return { scope: s.scope, scopeGeneral: s.general };
+        })(),
         expiresAt: null,
       }));
 

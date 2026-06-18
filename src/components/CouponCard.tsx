@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, ExternalLink, Tag, Clock, Users, Zap, AlertTriangle, Sparkles } from "lucide-react";
+import { Copy, Check, ExternalLink, Tag, Clock, Users, Zap, AlertTriangle, Sparkles, Layers } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
 import { StoreLogo } from "./StoreLogo";
 import { STORE_META, type Coupon } from "@/lib/types";
@@ -79,6 +79,20 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       </div>
 
       <h3 className="mt-1 line-clamp-2 text-sm font-medium text-slate-800">{coupon.title}</h3>
+
+      {coupon.scope && (
+        <p
+          className={`mt-2 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
+            coupon.scopeGeneral
+              ? "bg-emerald-50 text-emerald-700 ring-emerald-600/20"
+              : "bg-sky-50 text-sky-700 ring-sky-600/20"
+          }`}
+        >
+          <Layers className="h-3.5 w-3.5" />
+          {coupon.scopeGeneral ? "Vale em: " : "Só em: "}
+          {coupon.scope}
+        </p>
+      )}
 
       {coupon.description && (
         <p className="mt-1.5 rounded-lg bg-slate-50 px-2.5 py-1.5 text-xs leading-snug text-slate-600">

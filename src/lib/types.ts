@@ -38,6 +38,10 @@ export interface RawCoupon {
   exclusive?: boolean;
   /** Valor minimo de compra para o cupom valer (R$), quando detectado. */
   minPurchase?: number;
+  /** Onde o cupom vale (ex.: "Site todo", "Moda", "Produtos internacionais · 1ª compra"). */
+  scope?: string;
+  /** true se vale no site inteiro (geral); false se restrito a categoria/itens. */
+  scopeGeneral?: boolean;
   /** Data de expiracao, se conhecida (ISO 8601). */
   expiresAt?: string | null;
 }
