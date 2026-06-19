@@ -141,38 +141,20 @@ export default function Home() {
               ))}
             </nav>
 
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <button
-                onClick={refresh}
-                disabled={collecting}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white shadow-[0_0_18px_-4px_rgba(34,211,238,0.7)] transition hover:bg-brand-700 disabled:opacity-60"
-              >
-                <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
-                <span className="hidden sm:inline">Atualizar</span>
-              </button>
-            </div>
+            <ThemeToggle />
           </div>
 
           {/* Texto do hero no lado direito (desktop), sobre a imagem */}
           <div className="absolute inset-y-0 left-0 z-10 hidden w-[50%] items-end md:flex lg:w-[46%]">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#000000]/90 via-black/45 to-transparent" />
             <div className="relative px-8 pb-12 lg:px-14 lg:pb-16">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                </span>
-                Atualização automática · {timeAgo(updatedAt)} · {stats.active ?? 0} cupons ativos
-              </div>
-              <h1 className="display mt-4 text-4xl text-white lg:text-5xl">
+              <h1 className="display text-4xl text-white lg:text-5xl">
                 Economize
                 <br />
                 <span className="neon text-brand-300">de verdade.</span>
               </h1>
               <p className="mt-4 max-w-md text-sm text-white/85 lg:text-base">
-                Cupons verificados de Mercado Livre, Amazon e Shopee — com código, desconto e status. Reunidos de
-                agregadores e canais de Telegram, atualizados sozinhos.
+                Cupons de Mercado Livre, Amazon e Shopee, atualizados o tempo todo.
               </p>
             </div>
           </div>
@@ -181,21 +163,13 @@ export default function Home() {
 
       {/* Masthead editorial — so no mobile (no desktop o texto fica sobre a imagem) */}
       <section className="relative mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16 md:hidden">
-        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/70 px-3 py-1 text-xs font-medium text-zinc-500 backdrop-blur dark:border-cyan-400/15 dark:bg-white/5 dark:text-zinc-300">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          Atualização automática · {timeAgo(updatedAt)} · {stats.active ?? 0} cupons ativos
-        </div>
-        <h1 className="display mt-5 text-5xl text-zinc-900 dark:text-white sm:text-7xl">
+        <h1 className="display text-5xl text-zinc-900 dark:text-white sm:text-7xl">
           Economize
           <br />
           <span className="text-brand-600 dark:text-brand-300 dark:neon">de verdade.</span>
         </h1>
         <p className="mt-5 max-w-xl text-base text-zinc-600 dark:text-zinc-300/80">
-          Cupons verificados de Mercado Livre, Amazon e Shopee — com código, desconto e status. Reunidos de
-          agregadores e canais de Telegram, atualizados sozinhos.
+          Cupons de Mercado Livre, Amazon e Shopee, atualizados o tempo todo.
         </p>
       </section>
 
@@ -218,12 +192,31 @@ export default function Home() {
         </div>
 
         {/* Toolbar */}
-        <div id="cupons" className="mt-12 flex scroll-mt-24 items-end justify-between gap-4">
-          <h2 className="display text-2xl text-zinc-900 dark:text-white sm:text-3xl">Todos os cupons</h2>
-          <div className="hidden gap-4 text-right sm:flex">
-            <Stat label="Ativos" value={stats.active ?? 0} accent="text-emerald-600 dark:text-emerald-400" />
-            <Stat label="Suspeitos" value={stats.suspected_exhausted ?? 0} accent="text-amber-600 dark:text-amber-400" />
-            <Stat label="Expirados" value={stats.expired ?? 0} accent="text-rose-600 dark:text-rose-400" />
+        <div id="cupons" className="mt-12 flex scroll-mt-24 flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="display text-2xl text-zinc-900 dark:text-white sm:text-3xl">Todos os cupons</h2>
+            <p className="mt-1 flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              </span>
+              Atualização automática · {timeAgo(updatedAt)}
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden gap-4 text-right sm:flex">
+              <Stat label="Ativos" value={stats.active ?? 0} accent="text-emerald-600 dark:text-emerald-400" />
+              <Stat label="Suspeitos" value={stats.suspected_exhausted ?? 0} accent="text-amber-600 dark:text-amber-400" />
+              <Stat label="Expirados" value={stats.expired ?? 0} accent="text-rose-600 dark:text-rose-400" />
+            </div>
+            <button
+              onClick={refresh}
+              disabled={collecting}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3.5 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:opacity-60 dark:border-white/15 dark:text-zinc-200 dark:hover:bg-white/5"
+            >
+              <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
+              Atualizar
+            </button>
           </div>
         </div>
 

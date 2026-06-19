@@ -24,8 +24,9 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      aria-label="Alternar tema"
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800"
+      aria-label={dark ? "Mudar para tema claro" : "Mudar para tema escuro"}
+      title={dark ? "Tema claro" : "Tema escuro"}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white/85 ring-1 ring-white/15 backdrop-blur transition hover:bg-white/10 hover:text-white"
     >
       {dark ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
     </button>
