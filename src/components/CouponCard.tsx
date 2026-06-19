@@ -50,7 +50,9 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       ? { Icon: Users, text: `${coupon.usesToday.toLocaleString("pt-BR")} usaram hoje`, cls: "text-[#8a857a]" }
       : null;
 
-  const isNew = Date.now() - new Date(coupon.firstSeenAt).getTime() < 24 * 60 * 60 * 1000;
+  // "Novo" = postado na fonte (Telegram) nas ultimas 6h. Usa o tempo REAL do
+  // post (nao o firstSeenAt, que reseta a cada deploy do servidor).
+  const isNew = !!coupon.postedAt && Date.now() - new Date(coupon.postedAt).getTime() < 6 * 60 * 60 * 1000;
   const title = (coupon.title ?? "").replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}]/gu, "").replace(/\s+/g, " ").trim();
 
   // recortes do picote = cor do fundo da pagina (parecem furos no papel)

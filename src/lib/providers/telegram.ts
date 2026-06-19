@@ -169,6 +169,7 @@ async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawC
       scope,
       scopeGeneral: general,
       source: `telegram:${channel}`,
+      postedAt: Number.isFinite(postedAt) ? new Date(postedAt).toISOString() : null,
       expiresAt: null,
     });
   }

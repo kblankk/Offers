@@ -136,6 +136,30 @@ body {
   animation: fade-in 0.35s ease-out both;
 }
 
+/* Parallax do hero (CSS scroll-driven; a foto "respira" ao rolar).
+   Base com leve zoom para cobrir; anima so onde houver suporte e sem reduced-motion. */
+.hero-parallax {
+  transform: scale(1.06);
+  will-change: transform;
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-parallax {
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 90vh;
+    }
+    @keyframes hero-drift {
+      from {
+        transform: scale(1.08) translateY(0);
+      }
+      to {
+        transform: scale(1.08) translateY(7%);
+      }
+    }
+  }
+}
+
 /* Carimbo "prensando" na tela (rubber stamp) — alto impacto no load. */
 @keyframes stamp-in {
   0% {

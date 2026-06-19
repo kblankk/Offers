@@ -152,6 +152,7 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
       scope: useIncomingDesc ? raw.scope ?? existing.scope : existing.scope,
       scopeGeneral: useIncomingDesc ? raw.scopeGeneral ?? existing.scopeGeneral : existing.scopeGeneral,
       source: useIncomingDesc ? raw.source : existing.source,
+      postedAt: raw.postedAt ?? existing.postedAt,
       kind: raw.kind,
       expiresAt: raw.expiresAt ?? existing.expiresAt,
       status: draining ? "suspected_exhausted" : "active",
@@ -181,6 +182,7 @@ export function upsertCoupon(raw: RawCoupon): { coupon: Coupon; isNew: boolean }
     usesToday: raw.usesToday ?? 0,
     usesPeak: raw.usesToday ?? 0,
     usesDate: today,
+    postedAt: raw.postedAt ?? null,
     exclusive: raw.exclusive,
     minPurchase: raw.minPurchase,
     scope: raw.scope,
@@ -333,18 +335,29 @@ export function listCoupons(filter: ListFilter = {}): Coupon[] {
         (c.discountText ?? "").toLowerCase().includes(q),
     );
   }
-  // Ordena por: status (ativo > suspeito > expirado), depois confianca,
-  // depois quem mais usou hoje (sinal de que funciona), depois mais recente.
   const statusRank = (c: Coupon) =>
     c.status === "active" ? 0 : c.status === "suspected_exhausted" ? 1 : c.status === "unknown" ? 2 : 3;
   const confRank = (c: Coupon) => (c.confidence === "high" ? 0 : c.confidence === "medium" ? 1 : 2);
+  // "Recem-postado": cupom com postedAt (Telegram) nas ultimas 3h. Esse tempo e
+  // REAL (nao reseta no deploy), entao da pra colocar o que acabou de sair no topo.
+  const FRESH_MS = 3 * 60 * 60 * 1000;
+  const nowMs = Date.now();
+  const postedMs = (c: Coupon) => (c.postedAt ? Date.parse(c.postedAt) : NaN);
+  const isFresh = (c: Coupon) => {
+    const p = postedMs(c);
+    return Number.isFinite(p) && nowMs - p < FRESH_MS;
+  };
   items.sort((a, b) => {
-    // 1) ativos primeiro; 2) com certeza de funcionamento (alta confianca);
-    // 3) NOVOS primeiro (descobertos mais recentemente); 4) mais usados; 5) visto recente.
+    // 1) ativos primeiro;
     if (statusRank(a) !== statusRank(b)) return statusRank(a) - statusRank(b);
+    // 2) RECEM-POSTADOS no topo (e o mais novo primeiro entre eles);
+    const fa = isFresh(a), fb = isFresh(b);
+    if (fa !== fb) return fa ? -1 : 1;
+    if (fa && fb) return postedMs(b) - postedMs(a);
+    // 3) confianca; 4) mais usados hoje; 5) descoberto/visto mais recente.
     if (confRank(a) !== confRank(b)) return confRank(a) - confRank(b);
-    if (a.firstSeenAt !== b.firstSeenAt) return b.firstSeenAt.localeCompare(a.firstSeenAt);
     if ((b.usesToday ?? 0) !== (a.usesToday ?? 0)) return (b.usesToday ?? 0) - (a.usesToday ?? 0);
+    if (a.firstSeenAt !== b.firstSeenAt) return b.firstSeenAt.localeCompare(a.firstSeenAt);
     return b.lastSeenAt.localeCompare(a.lastSeenAt);
   });
   return filter.limit ? items.slice(0, filter.limit) : items;

@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { CodeTicker } from "@/components/CodeTicker";
 import { FeaturedCoupon } from "@/components/FeaturedCoupon";
 import { Logo } from "@/components/Logo";
+import { AtmosphereBG } from "@/components/AtmosphereBG";
 import { STORE_META, type Coupon, type CouponStatus, type Store } from "@/lib/types";
 
 type StoreFilter = Store | "all";
@@ -114,13 +115,16 @@ export default function Home() {
 
   return (
     <>
+      <AtmosphereBG />
       {/* Header em banner: a imagem de referencia INTEIRA (caixa na proporcao
           exata da foto => mostra a imagem toda, sem corte). */}
       <header className="relative w-full overflow-hidden">
-        <div
-          className="relative aspect-[2752/1536] w-full bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/header.jpg')" }}
-        >
+        <div className="relative aspect-[2752/1536] w-full">
+          {/* camada da foto (recebe o parallax ao rolar) */}
+          <div
+            className="hero-parallax absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/header.jpg')" }}
+          />
           {/* leve escurecimento no topo (nav legivel) e base fundindo no fundo */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#000000] to-transparent" />

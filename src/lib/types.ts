@@ -44,6 +44,8 @@ export interface RawCoupon {
   scopeGeneral?: boolean;
   /** De onde o cupom veio (ex.: "cuponomia", "telegram:economizandocomjp"). */
   source?: string;
+  /** Quando foi POSTADO na fonte (Telegram) — ISO. Tempo real, nao reseta no deploy. */
+  postedAt?: string | null;
   /** Data de expiracao, se conhecida (ISO 8601). */
   expiresAt?: string | null;
 }
