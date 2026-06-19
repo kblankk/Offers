@@ -6,7 +6,9 @@ import { StatusBadge } from "./StatusBadge";
 import { StoreLogo } from "./StoreLogo";
 import { STORE_META, storeUrl, type Coupon } from "@/lib/types";
 
-/** Card de cupom no formato de mini vale-desconto de papel (mesma linguagem do destaque). */
+const RED = "#c0392b";
+
+/** Card de cupom como mini vale-desconto impresso (letterpress, duas tintas). */
 export function CouponCard({ coupon }: { coupon: Coupon }) {
   const [copied, setCopied] = useState(false);
   const [vote, setVote] = useState<null | "ok" | "fail">(null);
@@ -56,28 +58,32 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
 
   return (
     <div
-      className={`card-elev paper-grain relative flex h-full flex-col overflow-hidden rounded-xl bg-[#f7f3ea] text-[#1b1a17] ring-1 ring-[#1b1a17]/10 transition duration-200 hover:-translate-y-1 ${
-        isExpired ? "opacity-60" : ""
+      className={`card-elev paper-grain relative flex h-full flex-col overflow-hidden rounded-lg bg-[#f7f3ea] text-[#1b1a17] ring-1 ring-[#1b1a17]/12 transition duration-200 hover:-translate-y-1 ${
+        isExpired ? "opacity-55" : ""
       }`}
     >
-      {/* aba na cor da loja */}
+      {/* faixa na cor da loja */}
       <div className="h-1.5 w-full" style={{ background: meta.color }} />
 
-      {/* conteudo */}
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
-            <StoreLogo store={coupon.store} src={coupon.imageUrl} size={24} />
-            <span className="truncate text-sm font-semibold text-[#1b1a17]">{meta.label}</span>
+            <StoreLogo store={coupon.store} src={coupon.imageUrl} size={22} />
+            <span className="truncate font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-[#1b1a17]">
+              {meta.label}
+            </span>
             {coupon.exclusive && (
-              <span title="Exclusivo — use pelo botão" className="text-violet-600">
+              <span title="Exclusivo — use pelo botão" style={{ color: RED }}>
                 <Sparkles className="h-3.5 w-3.5" />
               </span>
             )}
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
             {isNew && !isExpired && (
-              <span className="rounded-full bg-[#1b1a17] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#f7f3ea]">
+              <span
+                className="rotate-[-4deg] rounded-[3px] border-[1.5px] px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider"
+                style={{ borderColor: RED, color: RED }}
+              >
                 Novo
               </span>
             )}
@@ -85,26 +91,30 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
           </div>
         </div>
 
-        <div className="mt-4 flex items-baseline gap-2">
-          <span className="display text-[2rem] leading-none text-[#161410]">{coupon.discountText ?? "Oferta"}</span>
+        {/* desconto + regra vermelha (assinatura) */}
+        <p className="display mt-4 text-[2.3rem] font-extrabold leading-none text-[#161410]">
+          {coupon.discountText ?? "Oferta"}
+        </p>
+        <div className="mt-2 flex items-center gap-2">
+          <span className="h-[3px] w-9" style={{ background: RED }} />
           {typeof coupon.minPurchase === "number" && (
-            <span className="font-mono text-[11px] uppercase tracking-wide text-[#8a857a]">mín R${coupon.minPurchase}</span>
+            <span className="font-mono text-[10px] uppercase tracking-wide text-[#8a857a]">mín R${coupon.minPurchase}</span>
           )}
         </div>
 
-        <p className="mt-2 line-clamp-1 text-sm text-[#5b574e]">{title}</p>
+        <p className="mt-3 line-clamp-1 text-sm text-[#5b574e]">{title}</p>
 
-        <div className="mt-3 space-y-1.5 text-xs">
+        <div className="mt-3 space-y-1.5 font-mono text-[11px]">
           {coupon.scope && (
             <p className="flex items-center gap-1.5 text-[#8a857a]">
               <Layers className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate">{coupon.scope}</span>
+              <span className="truncate normal-case">{coupon.scope}</span>
             </p>
           )}
           {!isExpired && trust && (
             <p className={`flex items-center gap-1.5 ${trust.cls}`}>
               <trust.Icon className="h-3.5 w-3.5 shrink-0" />
-              {trust.text}
+              <span className="normal-case">{trust.text}</span>
             </p>
           )}
         </div>
@@ -114,7 +124,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       <div className="relative">
         <span className={`absolute left-0 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full ${notch}`} />
         <span className={`absolute right-0 top-1/2 h-4 w-4 translate-x-1/2 -translate-y-1/2 rounded-full ${notch}`} />
-        <div className="mx-4 border-t border-dashed border-[#1b1a17]/25" />
+        <div className="mx-4 border-t-2 border-dashed border-[#1b1a17]/25" />
       </div>
 
       {/* acao */}
@@ -124,14 +134,14 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
             <button
               onClick={copyCode}
               disabled={isExpired}
-              className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-md border border-dashed border-[#1b1a17]/30 px-3 py-2.5 transition hover:border-[#1b1a17]/60 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[4px] border-[1.5px] border-dashed border-[#1b1a17]/30 px-3 py-2.5 transition hover:border-[#1b1a17]/60 disabled:cursor-not-allowed disabled:opacity-60"
               title="Copiar código"
             >
               <span className="truncate font-mono text-sm font-bold tracking-wider text-[#161410]">{coupon.code}</span>
               {copied ? (
                 <Check className="h-4 w-4 shrink-0 text-emerald-600" />
               ) : (
-                <Copy className="h-4 w-4 shrink-0 text-[#1b1a17]/60" />
+                <Copy className="h-4 w-4 shrink-0" style={{ color: RED }} />
               )}
             </button>
             <a
@@ -139,7 +149,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
               target="_blank"
               rel="noopener noreferrer"
               title={coupon.exclusive ? "Ativar cupom" : "Ir à loja"}
-              className="inline-flex shrink-0 items-center justify-center rounded-md bg-[#1b1a17] px-3.5 text-[#f7f3ea] transition hover:bg-black"
+              className="inline-flex shrink-0 items-center justify-center rounded-[4px] bg-[#1b1a17] px-3.5 text-[#f7f3ea] transition hover:bg-black"
             >
               <ArrowUpRight className="h-5 w-5" />
             </a>
@@ -149,17 +159,16 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
             href={storeUrl(coupon)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 rounded-md bg-[#1b1a17] px-3 py-2.5 text-sm font-bold uppercase tracking-wider text-[#f7f3ea] transition hover:bg-black"
+            className="flex items-center justify-center gap-1.5 rounded-[4px] bg-[#1b1a17] px-3 py-2.5 font-mono text-sm font-bold uppercase tracking-wider text-[#f7f3ea] transition hover:bg-black"
           >
             Ativar desconto <ArrowUpRight className="h-4 w-4" />
           </a>
         )}
 
-        {/* Verificacao pela comunidade */}
         {!isExpired && (
-          <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-            <span className="text-[#8a857a]">
-              {vote ? (vote === "ok" ? "Valeu pelo retorno!" : "Obrigado — vamos avisar.") : "Funcionou?"}
+          <div className="mt-3 flex items-center justify-between gap-2 font-mono text-[11px]">
+            <span className="uppercase tracking-wide text-[#8a857a]">
+              {vote ? (vote === "ok" ? "Valeu!" : "Obrigado") : "Funcionou?"}
             </span>
             <div className="flex shrink-0 items-center gap-1.5">
               <button

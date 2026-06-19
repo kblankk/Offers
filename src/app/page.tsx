@@ -194,7 +194,10 @@ export default function Home() {
         {/* Toolbar */}
         <div id="cupons" className="mt-12 flex scroll-mt-24 flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="display text-2xl text-zinc-900 dark:text-white sm:text-3xl">Todos os cupons</h2>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em]" style={{ color: "#c0392b" }}>
+              ✶ Cupons do dia ✶
+            </p>
+            <h2 className="display mt-1 text-3xl text-zinc-900 dark:text-white sm:text-4xl">Todos os cupons</h2>
             <p className="mt-1 flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               {stats.active ?? 0} ativos · atualizado {timeAgo(updatedAt)}

@@ -68,8 +68,10 @@ export function ProductChecker() {
 
   return (
     <section className="card-elev paper-grain rounded-2xl bg-[#f7f3ea] p-5 text-[#1b1a17] ring-1 ring-[#1b1a17]/10 sm:p-6">
-      <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-[#8a857a]">Verificar anúncio</h2>
-      <p className="mt-2 text-lg font-semibold text-[#161410]">Tem um produto em mente?</p>
+      <h2 className="font-mono text-[11px] font-bold uppercase tracking-[0.3em]" style={{ color: "#c0392b" }}>
+        ✶ Verificar anúncio ✶
+      </h2>
+      <p className="display mt-2 text-xl font-bold text-[#161410]">Tem um produto em mente?</p>
       <p className="mt-1 text-sm text-[#5b574e]">
         Cole o link de um anúncio (Mercado Livre, Amazon ou Shopee) e veja quais cupons dá pra usar nele.
       </p>
