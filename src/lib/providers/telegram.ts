@@ -46,7 +46,12 @@ const BLOCK = new Set([
   "LIVRE", "MELI", "DESCONTO", "DESCONTOS", "PROMO", "PROMOCAO", "OFERTA", "OFERTAS",
   "CUPOM", "CUPONS", "CODIGO", "VOUCHER", "FRETE", "REAIS", "COMPRE", "GANHE", "LOJA", "SITE",
   "HTTP", "HTTPS", "WWW", "COM", "PARA", "VALE", "ABAIXO", "PRECO", "PRECINHO", "QUASE", "TODO",
-  "DESCONTOS", "LIMITADO", "ATIVE", "RESGATE", "SALVE", "AGORA",
+  "LIMITADO", "ATIVE", "RESGATE", "SALVE",
+  // palavras de marketing/anuncio que NAO sao codigo
+  "ANUNCIO", "ACIMA", "PARCELADO", "SELECIONE", "GARANTA", "GARANTIR", "OPORTUNIDADE",
+  "APROVEITE", "APROVEITAR", "CLIQUE", "PEGAR", "PEGUE", "CORRE", "CORRA", "CHEGA", "TURBINE",
+  "RELAMPAGO", "RELAMPAGOS", "LIBERADO", "LIBERARAM", "NOVOS", "NOVO", "JUROS", "VERSAO",
+  "POLEGADAS", "DESCONTOS", "PROMOCOES", "MAXIMA", "VELOCIDADE", "OBTENHA", "UTILIZE",
 ]);
 
 function isValidCode(raw: string): boolean {
@@ -73,13 +78,19 @@ function extractCode(text: string): string | null {
     const cand = mt[1]!.toUpperCase().replace(/[._-]+$/, "");
     if (isValidCode(cand)) return cand;
   }
-  // b) codigo isolado em uma linha (ex.: linha so com "🎟️ CHUTEIRA")
-  for (const line of text.split("\n")) {
-    const mm = line.trim().match(/^[^\p{L}\p{N}]{0,6}([A-Z][A-Z0-9]{4,23})[^\p{L}\p{N}]{0,6}$/u);
-    if (mm) {
-      const cand = mm[1]!.toUpperCase();
-      if (isValidCode(cand)) return cand;
-    }
+  // b) codigo isolado numa linha SOMENTE se a linha anterior pede um codigo
+  // (ex.: "Use o cupom:" / "Código:"). Evita capturar palavras soltas tipo
+  // "(ANÚNCIO)" ou "ACIMA DE R$149".
+  const lines = text.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const mm = lines[i]!.trim().match(/^[^\p{L}\p{N}]{0,6}([A-Z][A-Z0-9]{4,23})[^\p{L}\p{N}]{0,6}$/u);
+    if (!mm) continue;
+    let j = i - 1;
+    while (j >= 0 && !lines[j]!.trim()) j--;
+    const prev = j >= 0 ? lines[j]!.trim() : "";
+    if (!/(cupom|c[oó]digo|voucher)\b|:\s*$/i.test(prev)) continue;
+    const cand = mm[1]!.toUpperCase();
+    if (isValidCode(cand)) return cand;
   }
   return null;
 }
