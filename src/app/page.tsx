@@ -196,11 +196,8 @@ export default function Home() {
           <div>
             <h2 className="display text-2xl text-zinc-900 dark:text-white sm:text-3xl">Todos os cupons</h2>
             <p className="mt-1 flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              </span>
-              Atualização automática · {timeAgo(updatedAt)}
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              {stats.active ?? 0} ativos · atualizado {timeAgo(updatedAt)}
             </p>
           </div>
           <div className="flex items-center gap-4">
