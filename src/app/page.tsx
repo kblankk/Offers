@@ -404,7 +404,7 @@ function SkeletonGrid() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="surface h-56 animate-pulse rounded-2xl border border-zinc-200 bg-white dark:bg-transparent"
+          className="card-elev h-56 animate-pulse rounded-xl bg-[#f7f3ea] ring-1 ring-[#1b1a17]/10"
         />
       ))}
     </div>
