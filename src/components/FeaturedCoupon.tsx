@@ -41,7 +41,7 @@ export function FeaturedCoupon({ coupon }: { coupon: Coupon }) {
   }
 
   // recortes do picote = cor do fundo da pagina (parecem furos no papel)
-  const hole = "bg-[#f5f6f8] dark:bg-black";
+  const hole = "bg-[#e8e2d4] dark:bg-black";
 
   return (
     <div className="ticket-serrated relative flex flex-col bg-[#f7f3ea] text-[#1b1a17] sm:flex-row">

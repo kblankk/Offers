@@ -25,11 +25,9 @@ html {
 }
 
 body {
-  /* off-white para os cards (brancos) elevarem com profundidade */
-  background-color: #f5f6f8;
-  background-image: radial-gradient(55rem 26rem at 50% -7rem, rgba(6, 182, 212, 0.08), transparent 70%);
-  background-attachment: fixed;
-  color: #09090b;
+  /* "board" kraft quente — faz os cupons de papel creme saltarem */
+  background-color: #e8e2d4;
+  color: #1b1a17;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   min-height: 100vh;

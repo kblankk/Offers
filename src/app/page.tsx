@@ -209,7 +209,7 @@ export default function Home() {
             <button
               onClick={refresh}
               disabled={collecting}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3.5 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:opacity-60 dark:border-white/15 dark:text-zinc-200 dark:hover:bg-white/5"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-[#1b1a17] ring-1 ring-[#1b1a17]/20 transition hover:bg-[#1b1a17]/5 disabled:opacity-60 dark:text-zinc-200 dark:ring-white/15 dark:hover:bg-white/5"
             >
               <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
               Atualizar
@@ -219,17 +219,17 @@ export default function Home() {
 
         <div className="mt-5 flex flex-col gap-3">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-zinc-400" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[#8a857a]" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar por loja, código ou desconto"
-              className="surface-2 w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-9 text-sm outline-none transition placeholder:text-zinc-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/30 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+              className="w-full rounded-lg bg-[#f7f3ea] py-2.5 pl-10 pr-9 text-sm text-[#1b1a17] outline-none ring-1 ring-[#1b1a17]/15 transition placeholder:text-[#8a857a] focus:ring-2 focus:ring-[#1b1a17]/35"
             />
             {query && (
               <button
                 onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8a857a] hover:text-[#1b1a17]"
               >
                 <X className="h-[18px] w-[18px]" />
               </button>
@@ -241,12 +241,12 @@ export default function Home() {
             <div className="flex gap-2.5">
               {/* Loja */}
               <div className="group relative min-w-0 flex-1">
-                <StoreIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-500 dark:text-brand-300" />
+                <StoreIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a857a]" />
                 <select
                   value={store}
                   onChange={(e) => setStore(e.target.value as StoreFilter)}
                   aria-label="Filtrar por loja"
-                  className="w-full cursor-pointer appearance-none rounded-xl border border-zinc-200 bg-white py-2.5 pl-9 pr-9 text-sm font-medium text-zinc-700 shadow-sm outline-none transition [color-scheme:light] focus:border-brand-400 focus:ring-2 focus:ring-brand-500/25 dark:border-cyan-400/20 dark:bg-white/[0.06] dark:text-zinc-100 dark:shadow-[0_0_0_1px_rgba(34,211,238,0.04)] dark:backdrop-blur dark:[color-scheme:dark]"
+                  className="w-full cursor-pointer appearance-none rounded-xl bg-[#f7f3ea] py-2.5 pl-9 pr-9 text-sm font-medium text-[#1b1a17] outline-none ring-1 ring-[#1b1a17]/15 transition [color-scheme:light] focus:ring-2 focus:ring-[#1b1a17]/35"
                 >
                   <option value="all">Todas as lojas</option>
                   {(Object.keys(STORE_META) as Store[]).map((s) => (
@@ -255,16 +255,16 @@ export default function Home() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition group-focus-within:text-brand-500 dark:group-focus-within:text-brand-300" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a857a] transition" />
               </div>
               {/* Status */}
               <div className="group relative min-w-0 flex-1">
-                <SlidersHorizontal className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-500 dark:text-brand-300" />
+                <SlidersHorizontal className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a857a]" />
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as StatusFilter)}
                   aria-label="Filtrar por status"
-                  className="w-full cursor-pointer appearance-none rounded-xl border border-zinc-200 bg-white py-2.5 pl-9 pr-9 text-sm font-medium text-zinc-700 shadow-sm outline-none transition [color-scheme:light] focus:border-brand-400 focus:ring-2 focus:ring-brand-500/25 dark:border-cyan-400/20 dark:bg-white/[0.06] dark:text-zinc-100 dark:shadow-[0_0_0_1px_rgba(34,211,238,0.04)] dark:backdrop-blur dark:[color-scheme:dark]"
+                  className="w-full cursor-pointer appearance-none rounded-xl bg-[#f7f3ea] py-2.5 pl-9 pr-9 text-sm font-medium text-[#1b1a17] outline-none ring-1 ring-[#1b1a17]/15 transition [color-scheme:light] focus:ring-2 focus:ring-[#1b1a17]/35"
                 >
                   {STATUS_TABS.map((t) => (
                     <option key={t.key} value={t.key}>
@@ -272,7 +272,7 @@ export default function Home() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition group-focus-within:text-brand-500 dark:group-focus-within:text-brand-300" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a857a] transition" />
               </div>
             </div>
             {/* Só confiáveis */}
@@ -281,14 +281,14 @@ export default function Home() {
               aria-pressed={trusted}
               className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
                 trusted
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_8px_24px_-10px_rgba(16,185,129,0.8)]"
-                  : "border border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-cyan-400/20 dark:text-zinc-300 dark:hover:bg-white/5"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-[#f7f3ea] text-[#5b574e] ring-1 ring-[#1b1a17]/15 hover:ring-[#1b1a17]/35"
               }`}
             >
               <ShieldCheck className="h-4 w-4" />
               {trusted ? "Só cupons confiáveis" : "Mostrando todos"}
               <span
-                className={`ml-1 h-2 w-2 rounded-full ${trusted ? "bg-white/90" : "bg-zinc-300 dark:bg-zinc-600"}`}
+                className={`ml-1 h-2 w-2 rounded-full ${trusted ? "bg-white/90" : "bg-[#1b1a17]/25"}`}
               />
             </button>
           </div>
@@ -303,19 +303,19 @@ export default function Home() {
                 {STORE_META[s].label}
               </Chip>
             ))}
-            <span className="mx-1 h-5 w-px bg-zinc-200 dark:bg-zinc-800" />
+            <span className="mx-1 h-5 w-px bg-[#1b1a17]/15" />
             {STATUS_TABS.map((t) => (
               <Chip key={t.key} active={status === t.key} onClick={() => setStatus(t.key)}>
                 {t.label}
               </Chip>
             ))}
-            <span className="mx-1 h-5 w-px bg-zinc-200 dark:bg-zinc-800" />
+            <span className="mx-1 h-5 w-px bg-[#1b1a17]/15" />
             <button
               onClick={() => setTrusted((v) => !v)}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
                 trusted
                   ? "bg-emerald-600 text-white"
-                  : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  : "bg-[#f7f3ea] text-[#5b574e] ring-1 ring-[#1b1a17]/15 hover:ring-[#1b1a17]/35"
               }`}
             >
               <ShieldCheck className="h-4 w-4" />
@@ -324,11 +324,11 @@ export default function Home() {
           </div>
         </div>
 
-        <p className="mt-4 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+        <p className="mt-4 text-xs leading-relaxed text-[#8a857a]">
           Mostramos os mais confiáveis primeiro. Cupons{" "}
-          <strong className="font-medium text-zinc-600 dark:text-zinc-300">Exclusivos</strong> funcionam pelo link;{" "}
-          <strong className="font-medium text-zinc-600 dark:text-zinc-300">“Pode ter restrições”</strong> = a fonte não
-          confirmou onde valem. A confirmação final é sempre no checkout.
+          <strong className="font-semibold text-[#5b574e]">Exclusivos</strong> funcionam pelo link;{" "}
+          <strong className="font-semibold text-[#5b574e]">“Pode ter restrições”</strong> = a fonte não confirmou onde
+          valem. A confirmação final é sempre no checkout.
         </p>
 
         <div className="mt-5">
@@ -348,7 +348,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t border-zinc-200 dark:border-zinc-800">
+      <footer className="border-t border-[#1b1a17]/12 dark:border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-1 px-4 py-8 text-center sm:px-6">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Desenvolvido por{" "}
@@ -367,7 +367,7 @@ function Stat({ label, value, accent }: { label: string; value: number; accent?:
   return (
     <div>
       <p className={`display text-2xl ${accent ?? "text-zinc-900 dark:text-white"}`}>{value}</p>
-      <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">{label}</p>
+      <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{label}</p>
     </div>
   );
 }
@@ -388,8 +388,8 @@ function Chip({
       onClick={onClick}
       className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
         active
-          ? "bg-zinc-900 text-white dark:bg-brand-400 dark:text-zinc-950 dark:shadow-[0_0_14px_-2px_rgba(34,211,238,0.7)]"
-          : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 dark:border-cyan-400/15 dark:text-zinc-300 dark:hover:bg-white/5"
+          ? "bg-[#1b1a17] text-[#f7f3ea] dark:bg-[#f7f3ea] dark:text-[#1b1a17]"
+          : "text-[#5b574e] ring-1 ring-[#1b1a17]/15 hover:ring-[#1b1a17]/35 dark:text-zinc-300 dark:ring-white/15 dark:hover:ring-white/30"
       }`}
     >
       {dot && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />}
@@ -413,16 +413,16 @@ function SkeletonGrid() {
 
 function EmptyState({ onRefresh, collecting }: { onRefresh: () => void; collecting: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 py-16 text-center dark:border-zinc-700">
-      <Inbox className="h-9 w-9 text-zinc-300 dark:text-zinc-600" />
-      <p className="mt-3 text-sm font-medium text-zinc-700 dark:text-zinc-200">Nenhum cupom para este filtro</p>
-      <p className="mt-1 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
+    <div className="card-elev flex flex-col items-center justify-center rounded-xl bg-[#f7f3ea] py-16 text-center text-[#1b1a17] ring-1 ring-[#1b1a17]/10">
+      <Inbox className="h-9 w-9 text-[#1b1a17]/25" />
+      <p className="mt-3 text-sm font-semibold text-[#1b1a17]">Nenhum cupom para este filtro</p>
+      <p className="mt-1 max-w-sm text-sm text-[#5b574e]">
         Tente outro filtro ou atualize para buscar os mais recentes.
       </p>
       <button
         onClick={onRefresh}
         disabled={collecting}
-        className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-60"
+        className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#1b1a17] px-4 py-2 text-sm font-bold uppercase tracking-wider text-[#f7f3ea] transition hover:bg-black disabled:opacity-60"
       >
         <RefreshCw className={`h-4 w-4 ${collecting ? "animate-spin" : ""}`} />
         Atualizar

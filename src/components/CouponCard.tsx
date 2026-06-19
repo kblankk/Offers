@@ -52,7 +52,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
   const title = (coupon.title ?? "").replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}]/gu, "").replace(/\s+/g, " ").trim();
 
   // recortes do picote = cor do fundo da pagina (parecem furos no papel)
-  const notch = "bg-[#f5f6f8] dark:bg-black";
+  const notch = "bg-[#e8e2d4] dark:bg-black";
 
   return (
     <div
