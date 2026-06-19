@@ -82,7 +82,7 @@ export interface VerificationResult {
 
 export const STORE_META: Record<Store, { label: string; color: string }> = {
   mercadolivre: { label: "Mercado Livre", color: "#FFE600" },
-  amazon: { label: "Amazon", color: "#FF9900" },
+  amazon: { label: "Amazon", color: "#146EB4" },
   shopee: { label: "Shopee", color: "#EE4D2D" },
 };
 

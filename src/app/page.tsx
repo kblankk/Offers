@@ -10,6 +10,7 @@ import { FeaturedCoupon } from "@/components/FeaturedCoupon";
 import { Logo } from "@/components/Logo";
 import { ScrollFX } from "@/components/ScrollFX";
 import { HeroPhone } from "@/components/HeroPhone";
+import { HeroParticles } from "@/components/HeroParticles";
 import { STORE_META, type Coupon, type CouponStatus, type Store } from "@/lib/types";
 
 type StoreFilter = Store | "all";
@@ -130,6 +131,9 @@ export default function Home() {
           {/* leve escurecimento no topo (nav legivel) e base fundindo no fundo */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#000000] to-transparent" />
+
+          {/* particulas azuis em volta do cupom luminoso */}
+          <HeroParticles />
 
           {/* barra de navegacao sobre a imagem */}
           <div className="absolute inset-x-0 top-0 z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">

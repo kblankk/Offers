@@ -52,7 +52,7 @@ export function HeroPhone() {
               <div className="font-mono" style={{ background: PAPER, borderRadius: 11, padding: "10px 12px", fontSize: 11.5, color: "#8a857a", border: "1px solid rgba(27,26,23,.1)", marginBottom: 13 }}>⌕ buscar cupom</div>
               <div className="flex flex-col gap-[11px]">
                 <MiniCoupon store="Mercado Livre" dot="#E8C400" off="20% OFF" code="MELHOROFERTA" />
-                <MiniCoupon store="Amazon" dot="#FF9900" off="10% OFF" code="BRASILHOJE" />
+                <MiniCoupon store="Amazon" dot="#146EB4" off="10% OFF" code="BRASILHOJE" />
                 <MiniCoupon store="Shopee" dot="#EE4D2D" off="R$20 OFF" code="CUP0N0M1A17" />
               </div>
             </div>
