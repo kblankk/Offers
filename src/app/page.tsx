@@ -166,7 +166,7 @@ export default function Home() {
           </div>
 
           {/* Mockup de celular no lado direito (telas largas) */}
-          <div className="absolute right-[3%] top-1/2 z-[5] hidden -translate-y-1/2 scale-[.6] lg:block xl:right-[6%] xl:scale-[.78] 2xl:right-[8%] 2xl:scale-90">
+          <div className="absolute right-[2%] top-1/2 z-[5] hidden -translate-y-1/2 scale-[.66] lg:block xl:right-[5%] xl:scale-[.86] 2xl:right-[7%] 2xl:scale-100">
             <HeroPhone />
           </div>
         </div>
