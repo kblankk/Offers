@@ -3,10 +3,14 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Fundo atmosférico sutil (motion.md §6a): "poeira de papel" que deriva devagar
- * atrás do conteúdo. Barato (Canvas), respeita prefers-reduced-motion e pausa
- * quando a aba está oculta. Cor adapta ao tema (claro no preto, escuro no kraft).
+ * Animação temática: CUPONS CAINDO como folhas (o hero é uma floresta).
+ * Pequenas etiquetas/tickets descem balançando e girando, em tinta vermelha,
+ * preto e creme. Canvas leve, sem dependência. Aparece nas frestas do "board"
+ * (os cards de papel cobrem o resto). Respeita prefers-reduced-motion e pausa
+ * quando a aba está oculta.
  */
+const COLORS = ["#c0392b", "#c0392b", "#1b1a17", "#f7f3ea", "#c0392b"];
+
 export function AtmosphereBG() {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -15,49 +19,111 @@ export function AtmosphereBG() {
     if (!cv) return;
     const ctx = cv.getContext("2d");
     if (!ctx) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const dark = document.documentElement.classList.contains("dark");
-    const rgb = dark ? "245,243,234" : "27,26,23"; // creme no preto / tinta no kraft
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
     let w = 0;
     let h = 0;
     let raf = 0;
-    const N = 90;
-    const dots = Array.from({ length: N }, () => ({
-      x: Math.random(),
-      y: Math.random(),
-      vx: (Math.random() - 0.5) * 0.00028,
-      vy: (Math.random() - 0.5) * 0.00028,
-      r: Math.random() * 1.7 + 0.5,
-      a: Math.random() * 0.11 + 0.04,
-    }));
+
+    type Ticket = {
+      x: number;
+      y: number;
+      s: number; // tamanho
+      vy: number; // queda
+      sway: number; // amplitude do balanço
+      ph: number; // fase
+      rot: number;
+      vrot: number;
+      color: string;
+      alpha: number;
+    };
+
+    const N = 34;
+    const make = (top = false): Ticket => ({
+      x: Math.random() * (w || window.innerWidth * dpr),
+      y: top ? -20 * dpr : Math.random() * (h || window.innerHeight * dpr),
+      s: (14 + Math.random() * 16) * dpr,
+      vy: (0.22 + Math.random() * 0.5) * dpr,
+      sway: (10 + Math.random() * 20) * dpr,
+      ph: Math.random() * Math.PI * 2,
+      rot: Math.random() * Math.PI,
+      vrot: (Math.random() - 0.5) * 0.025,
+      color: COLORS[(Math.random() * COLORS.length) | 0]!,
+      alpha: 0.38 + Math.random() * 0.32,
+    });
 
     const resize = () => {
-      w = cv.width = window.innerWidth;
-      h = cv.height = window.innerHeight;
-    }
+      const box = cv.parentElement?.getBoundingClientRect();
+      const cw = box && box.width ? box.width : window.innerWidth;
+      const ch = box && box.height ? box.height : window.innerHeight;
+      // clamp de seguranca contra qualquer dimensao absurda
+      w = cv.width = Math.min(4096, Math.max(1, Math.floor(cw * dpr)));
+      h = cv.height = Math.min(4096, Math.max(1, Math.floor(ch * dpr)));
+    };
     resize();
     window.addEventListener("resize", resize);
 
-    const frame = () => {
+    let tickets = Array.from({ length: N }, () => make(false));
+
+    // desenha uma etiqueta (ticket) com furo, centrada em 0,0
+    const drawTicket = (t: Ticket) => {
+      const w0 = t.s;
+      const h0 = t.s * 0.66;
+      const r = t.s * 0.16;
+      ctx.globalAlpha = t.alpha;
+      ctx.fillStyle = t.color;
+      ctx.beginPath();
+      ctx.roundRect(-w0 / 2, -h0 / 2, w0, h0, r);
+      ctx.fill();
+      // furo (cor "vazada")
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.arc(-w0 / 2 + h0 * 0.38, 0, t.s * 0.09, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = "source-over";
+    };
+
+    let time = 0;
+    const draw = () => {
       ctx.clearRect(0, 0, w, h);
-      for (const d of dots) {
-        d.x = (d.x + d.vx + 1) % 1;
-        d.y = (d.y + d.vy + 1) % 1;
-        ctx.fillStyle = `rgba(${rgb},${d.a})`;
-        ctx.beginPath();
-        ctx.arc(d.x * w, d.y * h, d.r, 0, Math.PI * 2);
-        ctx.fill();
+      time += 0.016;
+      for (const t of tickets) {
+        t.y += t.vy;
+        t.rot += t.vrot;
+        const x = t.x + Math.sin(time * 0.8 + t.ph) * t.sway;
+        if (t.y - t.s > h) {
+          t.y = -t.s;
+          t.x = Math.random() * w;
+        }
+        ctx.save();
+        ctx.translate(x, t.y);
+        ctx.rotate(t.rot);
+        drawTicket(t);
+        ctx.restore();
       }
+      ctx.globalAlpha = 1;
+    };
+
+    const frame = () => {
+      draw();
       raf = requestAnimationFrame(frame);
+    };
+
+    if (reduce) {
+      // estático: alguns tickets parados, sem animação
+      tickets = Array.from({ length: 12 }, () => make(false));
+      draw();
+    } else {
+      frame();
     }
-    frame();
 
     const onVis = () => {
       cancelAnimationFrame(raf);
-      if (!document.hidden) frame();
-    }
+      if (!document.hidden && !reduce) frame();
+    };
     document.addEventListener("visibilitychange", onVis);
 
     return () => {
@@ -67,5 +133,5 @@ export function AtmosphereBG() {
     };
   }, []);
 
-  return <canvas ref={ref} aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10" />;
+  return <canvas ref={ref} aria-hidden="true" className="pointer-events-none absolute inset-0" />;
 }
