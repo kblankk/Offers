@@ -119,7 +119,7 @@ export default function Home() {
       {/* Header em banner: a imagem de referencia INTEIRA (caixa na proporcao
           exata da foto => mostra a imagem toda, sem corte). */}
       <header className="relative w-full overflow-hidden">
-        <div className="relative aspect-[2752/1536] max-h-[88vh] w-full">
+        <div className="relative aspect-[2752/1536] w-full [@media(max-height:800px)]:max-h-[92vh]">
           {/* camada da foto (recebe o parallax ao rolar — box maior pra ter folga) */}
           <div
             data-parallax="0.12"
