@@ -9,6 +9,7 @@ import { CodeTicker } from "@/components/CodeTicker";
 import { FeaturedCoupon } from "@/components/FeaturedCoupon";
 import { Logo } from "@/components/Logo";
 import { ScrollFX } from "@/components/ScrollFX";
+import { HeroPhone } from "@/components/HeroPhone";
 import { STORE_META, type Coupon, type CouponStatus, type Store } from "@/lib/types";
 
 type StoreFilter = Store | "all";
@@ -162,6 +163,11 @@ export default function Home() {
                 Cupons de Mercado Livre, Amazon e Shopee, atualizados o tempo todo.
               </p>
             </div>
+          </div>
+
+          {/* Mockup de celular no lado direito (telas largas) */}
+          <div className="absolute right-[3%] top-1/2 z-[5] hidden -translate-y-1/2 scale-[.6] lg:block xl:right-[6%] xl:scale-[.78] 2xl:right-[8%] 2xl:scale-90">
+            <HeroPhone />
           </div>
         </div>
       </header>

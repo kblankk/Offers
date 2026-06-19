@@ -176,6 +176,32 @@ body {
   animation-delay: 0.35s;
 }
 
+/* Mockup do hero (celular + cards flutuando) — do design v2. */
+@keyframes v2-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes v2-floatb {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+@keyframes v2-reveal {
+  from { opacity: 0; transform: rotate(-4deg) scale(1.04); }
+  to { opacity: 1; transform: rotate(-4deg) scale(1); }
+}
+@keyframes v2-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.v2-float { animation: v2-float 6s ease-in-out infinite; }
+.v2-floatb { animation: v2-floatb 7s ease-in-out infinite; }
+.v2-floatc { animation: v2-floatb 8s ease-in-out infinite; }
+.v2-reveal { animation: v2-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.v2-rise { animation: v2-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .v2-float, .v2-floatb, .v2-floatc { animation: none; }
+}
+
 /* Pulso lento dos brilhos decorativos do hero */
 @keyframes glow-pulse {
   0%, 100% {
