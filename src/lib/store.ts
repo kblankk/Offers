@@ -345,9 +345,17 @@ export function listCoupons(filter: ListFilter = {}): Coupon[] {
   // ex.: "R$3.000 OFF em Smartphone Motorola", "20% OFF em brinquedos").
   // Vale para TODAS as fontes (Cuponomia e Telegram); checamos so o TITULO
   // (a descricao as vezes cita produtos de exemplo num cupom generico).
+  // Desconto impossivel (>=90% OFF) = quase sempre misparse de um nome de
+  // produto (ex.: "Beta Alanina 100% Pura" virou "100% OFF"). Descarta.
+  const bogusPct = (s?: string): boolean => {
+    const m = /(\d{1,3})\s*%/.exec(s ?? "");
+    return m ? Number(m[1]) >= 90 : false;
+  };
   items = items.filter(
     (c) =>
-      !/^por\b/i.test(c.discountText ?? "") && !PRODUCT_NOUNS.test(normalizeText(c.title)),
+      !/^por\b/i.test(c.discountText ?? "") &&
+      !bogusPct(c.discountText) &&
+      !PRODUCT_NOUNS.test(normalizeText(c.title)),
   );
   if (filter.store) items = items.filter((c) => c.store === filter.store);
   if (filter.status) items = items.filter((c) => c.status === filter.status);

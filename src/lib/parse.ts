@@ -85,7 +85,7 @@ export function parseScope(text: string, storeWide: boolean): { scope: string; g
  * produto (ex.: furadeira, TV, celular), nao um cupom generico — descartamos.
  */
 export const PRODUCT_NOUNS =
-  /furadeira|parafusadeira|aspirador|extratora|geladeira|fogao|microondas|lavadora|secadora|cafeteira|liquidificador|batedeira|air ?fryer|fritadeira|smart ?tv|\btvs?\b|televis|celular|smartphone|iphone|galaxy|motorola|xiaomi|redmi|notebook|laptop|\bmonitor|teclado|\bmouse\b|headset|\bfones?\b|caixa de som|console|playstation|xbox|nintendo|cadeira|\bsofas?\b|colchao|\bmesas?\b|\btenis\b|camiseta|\bcalca|vestido|jaqueta|perfume|shampoo|\bwhey\b|creatina|suplemento|bicicleta|patinete|\bbola\b|brinquedo|boneca|fralda|\bpanela|garrafa|mochila|relogio|smartwatch|airpod|echo dot|\balexa\b|ventilador|impressora|\bdrone\b|violao|ferramenta|chave de fenda/;
+  /furadeira|parafusadeira|aspirador|extratora|geladeira|fogao|microondas|lavadora|secadora|cafeteira|liquidificador|batedeira|air ?fryer|fritadeira|smart ?tv|\btvs?\b|televis|celular|smartphone|iphone|galaxy|motorola|xiaomi|redmi|notebook|laptop|\bmonitor|teclado|\bmouse\b|headset|\bfones?\b|caixa de som|console|playstation|xbox|nintendo|cadeira|\bsofas?\b|colchao|\bmesas?\b|\btenis\b|camiseta|\bcalca|vestido|jaqueta|perfume|shampoo|\bwhey\b|creatina|suplemento|alanina|\bbcaa\b|glutamina|proteina|colageno|termogenic|nutrition|bicicleta|patinete|\bbola\b|brinquedo|boneca|fralda|\bpanela|garrafa|mochila|relogio|smartwatch|airpod|echo dot|\balexa\b|ventilador|impressora|\bdrone\b|violao|ferramenta|chave de fenda/;
 
 /** Categorias detectadas num texto (titulo de produto, descricao de cupom, etc.). */
 export function detectCategories(text: string): string[] {
