@@ -67,7 +67,7 @@ export function ProductChecker() {
   const meta = product ? STORE_META[product.store] : null;
 
   return (
-    <section className="card-elev rounded-2xl bg-[#f7f3ea] p-5 text-[#1b1a17] ring-1 ring-[#1b1a17]/10 sm:p-6">
+    <section className="card-elev paper-grain rounded-2xl bg-[#f7f3ea] p-5 text-[#1b1a17] ring-1 ring-[#1b1a17]/10 sm:p-6">
       <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-[#8a857a]">Verificar anúncio</h2>
       <p className="mt-2 text-lg font-semibold text-[#161410]">Tem um produto em mente?</p>
       <p className="mt-1 text-sm text-[#5b574e]">

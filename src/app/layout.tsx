@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { Inter, Archivo } from "next/font/google";
+import { Hanken_Grotesk, Bricolage_Grotesque, Space_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const display = Archivo({ subsets: ["latin"], variable: "--font-display", weight: ["600", "700", "800", "900"] });
+// Tipografia com caráter (skill frontend-design: fugir de Inter/Roboto/system):
+//  - Bricolage Grotesque: display editorial, com personalidade (manchetes, descontos)
+//  - Hanken Grotesk: corpo humanista, quente, legível
+//  - Space Mono: o "recibo" — códigos, rótulos, carimbos
+const sans = Hanken_Grotesk({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+const mono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-mono-r", display: "swap" });
 
 export const metadata: Metadata = {
   title: "AllCupom — cupons verificados de Mercado Livre, Amazon e Shopee",
@@ -16,7 +21,7 @@ const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t!==
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${display.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={`${sans.variable} ${display.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

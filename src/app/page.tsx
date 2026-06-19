@@ -147,7 +147,7 @@ export default function Home() {
           {/* Texto do hero no lado direito (desktop), sobre a imagem */}
           <div className="absolute inset-y-0 left-0 z-10 hidden w-[50%] items-end md:flex lg:w-[46%]">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#000000]/90 via-black/45 to-transparent" />
-            <div className="relative px-8 pb-12 lg:px-14 lg:pb-16">
+            <div className="animate-fade-in relative px-8 pb-12 lg:px-14 lg:pb-16">
               <h1 className="display text-4xl text-white lg:text-5xl">
                 Economize
                 <br />
@@ -175,7 +175,7 @@ export default function Home() {
 
       {/* Destaque */}
       {featured && (
-        <section id="destaque" className="mx-auto mt-10 max-w-6xl scroll-mt-24 px-4 sm:px-6">
+        <section id="destaque" className="animate-fade-in mx-auto mt-10 max-w-6xl scroll-mt-24 px-4 sm:px-6">
           <FeaturedCoupon coupon={featured} />
         </section>
       )}
@@ -338,8 +338,8 @@ export default function Home() {
             <EmptyState onRefresh={refresh} collecting={collecting} />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {coupons.map((c) => (
-                <div key={c.id} className="animate-fade-in">
+              {coupons.map((c, i) => (
+                <div key={c.id} className="animate-fade-in" style={{ animationDelay: `${Math.min(i, 11) * 45}ms` }}>
                   <CouponCard coupon={c} />
                 </div>
               ))}

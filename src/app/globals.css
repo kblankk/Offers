@@ -15,6 +15,13 @@
   --color-brand-700: #0e7490;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-r), ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+/* Textura de papel (grain dessaturado, bem sutil) para as superficies creme —
+   da atmosfera/profundidade em vez de cor chapada (skill frontend-design). */
+.paper-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
 }
 
 html {

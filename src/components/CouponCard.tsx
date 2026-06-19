@@ -56,7 +56,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
 
   return (
     <div
-      className={`card-elev relative flex h-full flex-col overflow-hidden rounded-xl bg-[#f7f3ea] text-[#1b1a17] ring-1 ring-[#1b1a17]/10 transition duration-200 hover:-translate-y-1 ${
+      className={`card-elev paper-grain relative flex h-full flex-col overflow-hidden rounded-xl bg-[#f7f3ea] text-[#1b1a17] ring-1 ring-[#1b1a17]/10 transition duration-200 hover:-translate-y-1 ${
         isExpired ? "opacity-60" : ""
       }`}
     >

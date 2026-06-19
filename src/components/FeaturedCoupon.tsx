@@ -44,7 +44,7 @@ export function FeaturedCoupon({ coupon }: { coupon: Coupon }) {
   const hole = "bg-[#e8e2d4] dark:bg-black";
 
   return (
-    <div className="ticket-serrated relative flex flex-col bg-[#f7f3ea] text-[#1b1a17] sm:flex-row">
+    <div className="ticket-serrated paper-grain relative flex flex-col bg-[#f7f3ea] text-[#1b1a17] sm:flex-row">
       {/* OFERTA (esquerda) */}
       <div className="relative flex-1 px-7 py-9 sm:px-10">
         {/* carimbo de validade */}
