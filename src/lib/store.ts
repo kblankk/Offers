@@ -340,13 +340,14 @@ export function listCoupons(filter: ListFilter = {}): Coupon[] {
       ? { ...c, status: "expired" as const, statusReason: "Saiu da lista da fonte (provavelmente esgotou ou expirou)." }
       : c;
   });
-  // Rede de seguranca: esconde deals de produto (preco "Por R$ ..." em vez de
-  // um desconto), e cupons do Telegram cujo titulo e um produto concreto
-  // (ex.: furadeira/TV) mesmo que tenham sido coletados antes do filtro.
+  // Rede de seguranca: esconde deals/cupons de PRODUTO ESPECIFICO (preco
+  // "Por R$ ..." em vez de desconto, ou titulo que cita um produto concreto —
+  // ex.: "R$3.000 OFF em Smartphone Motorola", "20% OFF em brinquedos").
+  // Vale para TODAS as fontes (Cuponomia e Telegram); checamos so o TITULO
+  // (a descricao as vezes cita produtos de exemplo num cupom generico).
   items = items.filter(
     (c) =>
-      !/^por\b/i.test(c.discountText ?? "") &&
-      !((c.source ?? "").startsWith("telegram") && PRODUCT_NOUNS.test(normalizeText(c.title))),
+      !/^por\b/i.test(c.discountText ?? "") && !PRODUCT_NOUNS.test(normalizeText(c.title)),
   );
   if (filter.store) items = items.filter((c) => c.store === filter.store);
   if (filter.status) items = items.filter((c) => c.status === filter.status);
