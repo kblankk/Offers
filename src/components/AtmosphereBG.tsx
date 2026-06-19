@@ -23,14 +23,14 @@ export function AtmosphereBG() {
     let w = 0;
     let h = 0;
     let raf = 0;
-    const N = 64;
+    const N = 90;
     const dots = Array.from({ length: N }, () => ({
       x: Math.random(),
       y: Math.random(),
-      vx: (Math.random() - 0.5) * 0.00016,
-      vy: (Math.random() - 0.5) * 0.00016,
-      r: Math.random() * 1.3 + 0.4,
-      a: Math.random() * 0.05 + 0.015,
+      vx: (Math.random() - 0.5) * 0.00028,
+      vy: (Math.random() - 0.5) * 0.00028,
+      r: Math.random() * 1.7 + 0.5,
+      a: Math.random() * 0.11 + 0.04,
     }));
 
     const resize = () => {
