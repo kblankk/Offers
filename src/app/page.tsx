@@ -124,8 +124,8 @@ export default function Home() {
         <div className="relative aspect-[2752/1536] w-full">
           {/* camada da foto (recebe o parallax ao rolar — box maior pra ter folga) */}
           <div
-            data-parallax="0.18"
-            className="absolute -top-[22%] left-0 h-[144%] w-full bg-cover bg-center bg-no-repeat"
+            data-parallax="0.12"
+            className="absolute -top-[10%] left-0 h-[120%] w-full bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: "url('/header.jpg')" }}
           />
           {/* leve escurecimento no topo (nav legivel) e base fundindo no fundo */}

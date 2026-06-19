@@ -136,23 +136,20 @@ body {
   animation: fade-in 0.35s ease-out both;
 }
 
-/* Scroll-reveal (JS adiciona .is-in via IntersectionObserver). Visivel e
-   confiavel em qualquer navegador. */
+/* Scroll-reveal A PROVA DE FALHA: o conteudo so e escondido (classe .pre) pelo
+   JS quando esta ABAIXO da dobra; o JS remove .pre ao entrar na tela. Sem JS, ou
+   se algo falhar, nada fica escondido (base = visivel). */
 [data-reveal] {
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+[data-reveal].pre {
   opacity: 0;
   transform: translateY(28px);
-  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: opacity, transform;
-}
-[data-reveal].is-in {
-  opacity: 1;
-  transform: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
+  [data-reveal].pre {
     opacity: 1;
     transform: none;
-    transition: none;
   }
 }
 
