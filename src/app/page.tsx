@@ -9,6 +9,7 @@ import { CodeTicker } from "@/components/CodeTicker";
 import { FeaturedCoupon } from "@/components/FeaturedCoupon";
 import { Logo } from "@/components/Logo";
 import { AtmosphereBG } from "@/components/AtmosphereBG";
+import { ScrollFX } from "@/components/ScrollFX";
 import { STORE_META, type Coupon, type CouponStatus, type Store } from "@/lib/types";
 
 type StoreFilter = Store | "all";
@@ -120,9 +121,10 @@ export default function Home() {
           exata da foto => mostra a imagem toda, sem corte). */}
       <header className="relative w-full overflow-hidden">
         <div className="relative aspect-[2752/1536] w-full">
-          {/* camada da foto (recebe o parallax ao rolar) */}
+          {/* camada da foto (recebe o parallax ao rolar — box maior pra ter folga) */}
           <div
-            className="hero-parallax absolute inset-0 bg-cover bg-center bg-no-repeat"
+            data-parallax="0.18"
+            className="absolute -top-[22%] left-0 h-[144%] w-full bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: "url('/header.jpg')" }}
           />
           {/* leve escurecimento no topo (nav legivel) e base fundindo no fundo */}
@@ -345,8 +347,8 @@ export default function Home() {
             <EmptyState onRefresh={refresh} collecting={collecting} />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {coupons.map((c, i) => (
-                <div key={c.id} className="animate-fade-in" style={{ animationDelay: `${Math.min(i, 11) * 45}ms` }}>
+              {coupons.map((c) => (
+                <div key={c.id} data-reveal>
                   <CouponCard coupon={c} />
                 </div>
               ))}

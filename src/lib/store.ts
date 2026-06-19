@@ -4,20 +4,25 @@ import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync, statSyn
 import { config } from "./config";
 import { createLogger } from "./logger";
 import { normalizeText, PRODUCT_NOUNS } from "./parse";
+import { usingSupabase, supaLoad, supaSave } from "./persistence";
 import type { Coupon, CouponStatus, RawCoupon, Store, VerificationResult } from "./types";
 
 const log = createLogger("store");
 
 /**
- * Armazenamento em arquivo JSON (gratuito, sem compilacao nativa).
- * O volume de cupons (centenas) cabe em memoria; persistimos de forma atomica.
+ * Armazenamento em memoria + persistencia duravel:
+ *  - Supabase (Postgres gratuito) se SUPABASE_URL/KEY existirem — sobrevive a
+ *    deploys do Render (disco efemero);
+ *  - senao, arquivo JSON local (sem configurar nada).
  */
 mkdirSync(dirname(config.dbPath), { recursive: true });
 
 const data = new Map<string, Coupon>();
 let lastMtimeMs = 0;
+let loaded = false;
 
-function load(): void {
+function loadFromFile(): void {
+  loaded = true;
   if (!existsSync(config.dbPath)) return;
   try {
     const arr = JSON.parse(readFileSync(config.dbPath, "utf8")) as Coupon[];
@@ -30,22 +35,42 @@ function load(): void {
   }
 }
 
-/**
- * Recarrega do disco se o arquivo mudou (ex.: o worker, em outro processo,
- * coletou novos cupons). Chamado antes de cada leitura.
- */
+async function loadFromSupabase(): Promise<void> {
+  try {
+    const arr = await supaLoad();
+    if (arr) for (const c of arr) data.set(c.id, c);
+    log.info(`Supabase: ${data.size} cupons carregados.`);
+  } finally {
+    loaded = true;
+  }
+}
+
+/** Recarrega do disco se mudou (so no modo arquivo). */
 function reloadIfChanged(): void {
+  if (usingSupabase) return;
   if (!existsSync(config.dbPath)) return;
   try {
     const mtime = statSync(config.dbPath).mtimeMs;
-    if (mtime > lastMtimeMs) load();
+    if (mtime > lastMtimeMs) loadFromFile();
   } catch {
     /* ignora */
   }
 }
 
 let saveQueued = false;
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
 function persist(): void {
+  if (usingSupabase) {
+    // Debounce por tempo: um save por ciclo de coleta (evita ~centenas de
+    // requests). Nao salva antes de carregar o que ja existe (anti-corrida).
+    if (saveTimer) return;
+    saveTimer = setTimeout(() => {
+      saveTimer = null;
+      if (loaded) void supaSave([...data.values()]);
+    }, 4000);
+    if (typeof saveTimer.unref === "function") saveTimer.unref();
+    return;
+  }
   if (saveQueued) return;
   saveQueued = true;
   queueMicrotask(() => {
@@ -60,7 +85,8 @@ function persist(): void {
   });
 }
 
-load();
+if (usingSupabase) void loadFromSupabase();
+else loadFromFile();
 
 /**
  * Chave estavel. Quando ha codigo, deduplica por loja+codigo (mesmo cupom de
