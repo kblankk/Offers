@@ -138,7 +138,7 @@ export default function Home() {
           <HeroParticles />
 
           {/* barra de navegacao sobre a imagem */}
-          <div className="absolute inset-x-0 top-0 z-10 mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+          <div className="absolute inset-x-0 top-0 z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
             <Logo light />
 
             <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
@@ -179,7 +179,7 @@ export default function Home() {
       </header>
 
       {/* Masthead editorial — so no mobile (no desktop o texto fica sobre a imagem) */}
-      <section className="relative mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16 md:hidden">
+      <section className="relative mx-auto max-w-7xl px-4 pt-12 sm:px-6 sm:pt-16 md:hidden">
         <h1 className="display text-5xl text-zinc-900 dark:text-white sm:text-7xl">
           Economize
           <br />
@@ -192,7 +192,7 @@ export default function Home() {
 
       {/* Destaque */}
       {featured && (
-        <section id="destaque" className="animate-fade-in mx-auto mt-10 max-w-6xl scroll-mt-24 px-4 sm:px-6">
+        <section id="destaque" className="animate-fade-in mx-auto mt-10 max-w-7xl scroll-mt-24 px-4 sm:px-6">
           <FeaturedCoupon coupon={featured} />
         </section>
       )}
@@ -202,7 +202,7 @@ export default function Home() {
         <CodeTicker coupons={highlights} />
       </div>
 
-      <main className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+      <main className="mx-auto max-w-7xl px-4 pb-24 sm:px-6">
         {/* Checador */}
         <div id="verificar" className="mt-10 scroll-mt-24">
           <ProductChecker />
@@ -369,7 +369,7 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-[#1b1a17]/12 dark:border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-1 px-4 py-8 text-center sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-1 px-4 py-8 text-center sm:px-6">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Desenvolvido por{" "}
             <span className="font-medium text-zinc-700 dark:text-zinc-200">Kawã Crispim de Oliveira</span>

@@ -41,7 +41,7 @@ export default async function StorePage({ params }: { params: Promise<{ store: s
   const others = (Object.keys(STORE_SLUG) as Store[]).filter((s) => s !== store);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <header className="flex items-center justify-between gap-3">
         <Link href="/" aria-label="AllCupom — início">
           <Logo />

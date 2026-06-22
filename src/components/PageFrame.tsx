@@ -16,7 +16,7 @@ function Cross({ className }: { className: string }) {
 
 export function PageFrame() {
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1] hidden select-none xl:block">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[1] hidden select-none 2xl:block">
       {/* trilho esquerdo (lê de baixo pra cima) */}
       <div className="absolute inset-y-0 left-0 flex w-12 items-center justify-center overflow-hidden">
         <span
