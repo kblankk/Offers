@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Hanken_Grotesk, Bricolage_Grotesque, Space_Mono } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 
 // Tipografia com caráter (skill frontend-design: fugir de Inter/Roboto/system):
 //  - Bricolage Grotesque: display editorial, com personalidade (manchetes, descontos)
@@ -11,9 +12,23 @@ const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-disp
 const mono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-mono-r", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "AllCupom — cupons verificados de Mercado Livre, Amazon e Shopee",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "AllCupom — cupons verificados de Mercado Livre, Amazon e Shopee",
+    template: "%s",
+  },
   description:
     "Encontre cupons reais (código + %) de Mercado Livre, Amazon e Shopee. Status verificado, fontes citadas e atualização automática.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "AllCupom — cupons verificados de Mercado Livre, Amazon e Shopee",
+    description: "Cupons reais (código + %) testados e atualizados o tempo todo. Veja os que realmente funcionam.",
+    url: SITE_URL,
+    siteName: "AllCupom",
+    type: "website",
+    images: ["/header.jpg"],
+    locale: "pt_BR",
+  },
 };
 
 // Tema padrao: ESCURO (pegada neon). Respeita a escolha salva, sem flash.

@@ -1,3 +1,5 @@
+import { withAffiliate } from "./affiliate";
+
 /** Lojas suportadas. */
 export type Store = "mercadolivre" | "amazon" | "shopee";
 
@@ -102,5 +104,6 @@ export const STORE_HOME: Record<Store, string> = {
 export function storeUrl(coupon: Pick<Coupon, "url" | "store">): string {
   const u = coupon.url ?? "";
   const isStore = /mercadolivre|mercadolibre|amazon\.|amzn\.|shopee\.com|s\.shopee|shp\.ee/i.test(u);
-  return isStore ? u : STORE_HOME[coupon.store];
+  const dest = isStore ? u : STORE_HOME[coupon.store];
+  return withAffiliate(dest, coupon.store);
 }

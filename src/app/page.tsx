@@ -11,6 +11,8 @@ import { Logo } from "@/components/Logo";
 import { ScrollFX } from "@/components/ScrollFX";
 import { HeroPhone } from "@/components/HeroPhone";
 import { HeroParticles } from "@/components/HeroParticles";
+import { hasAffiliate } from "@/lib/affiliate";
+import { STORE_SLUG } from "@/lib/site";
 import { STORE_META, type Coupon, type CouponStatus, type Store } from "@/lib/types";
 
 type StoreFilter = Store | "all";
@@ -372,9 +374,26 @@ export default function Home() {
             Desenvolvido por{" "}
             <span className="font-medium text-zinc-700 dark:text-zinc-200">Kawã Crispim de Oliveira</span>
           </p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Cupons por loja:{" "}
+            {(Object.keys(STORE_SLUG) as Store[]).map((s, i) => (
+              <span key={s}>
+                <a href={`/loja/${STORE_SLUG[s]}`} className="font-medium text-[#c0392b] hover:underline">
+                  {STORE_META[s].label}
+                </a>
+                {i < 2 ? " · " : ""}
+              </span>
+            ))}
+          </p>
           <p className="text-xs text-zinc-400 dark:text-zinc-500">
             AllCupom · {new Date().getFullYear()}
           </p>
+          {hasAffiliate && (
+            <p className="mt-2 max-w-md text-[11px] leading-relaxed text-zinc-400 dark:text-zinc-500">
+              Alguns links são de afiliado — podemos ganhar uma comissão por compras feitas por eles, sem custo extra
+              pra você. Isso ajuda a manter o AllCupom no ar.
+            </p>
+          )}
         </div>
       </footer>
     </>
