@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Hanken_Grotesk, Bricolage_Grotesque, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
+import { PageFrame } from "@/components/PageFrame";
 
 // Tipografia com caráter (skill frontend-design: fugir de Inter/Roboto/system):
 //  - Bricolage Grotesque: display editorial, com personalidade (manchetes, descontos)
@@ -40,7 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <PageFrame />
+        {children}
+      </body>
     </html>
   );
 }
