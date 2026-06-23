@@ -52,6 +52,9 @@ const BLOCK = new Set([
   "APROVEITE", "APROVEITAR", "CLIQUE", "PEGAR", "PEGUE", "CORRE", "CORRA", "CHEGA", "TURBINE",
   "RELAMPAGO", "RELAMPAGOS", "LIBERADO", "LIBERARAM", "NOVOS", "NOVO", "JUROS", "VERSAO",
   "POLEGADAS", "DESCONTOS", "PROMOCOES", "MAXIMA", "VELOCIDADE", "OBTENHA", "UTILIZE",
+  // palavras que aparecem em CAIXA ALTA e nao sao codigo
+  "LIMITE", "LIMITES", "PRIMEIRA", "COMPRA", "VALOR", "TOTAL", "SELECIONADOS", "SELECIONADO",
+  "PRODUTOS", "PRODUTO", "INTERNACIONAIS", "VALIDO", "VALIDA", "EXCLUSIVO", "APENAS",
 ]);
 
 function isValidCode(raw: string): boolean {
@@ -75,8 +78,19 @@ function extractCode(text: string): string | null {
   const re = /(?:cupom|c[oó]digo|voucher|\bcod\b|\boff\b)[^\p{L}\p{N}\n]{0,12}([A-Z][A-Z0-9._-]{3,23})/giu;
   let mt: RegExpExecArray | null;
   while ((mt = re.exec(text)) !== null) {
-    const cand = mt[1]!.toUpperCase().replace(/[._-]+$/, "");
+    const raw = mt[1]!;
+    // O flag `i` deixa [A-Z] casar minusculas; codigos reais sao MAIUSCULOS.
+    // Se a captura tem minuscula, e palavra comum ("Limite", "Compra") — pula.
+    if (/[a-z]/.test(raw)) continue;
+    const cand = raw.toUpperCase().replace(/[._-]+$/, "");
     if (isValidCode(cand)) return cand;
+  }
+  // c) fallback: token MAIUSCULO com letras E numeros (assinatura forte de codigo,
+  // ex.: "AMOPRIME60"), mesmo sem palavra-chave antes.
+  const strong = text.match(/\b([A-Z]{2,}[0-9]+[A-Z0-9]*|[A-Z0-9]*[0-9][A-Z]{2,}[A-Z0-9]*)\b/);
+  if (strong) {
+    const cand = strong[1]!.replace(/[._-]+$/, "");
+    if (cand.length >= 5 && cand.length <= 24 && isValidCode(cand)) return cand;
   }
   // b) codigo isolado numa linha SOMENTE se a linha anterior pede um codigo
   // (ex.: "Use o cupom:" / "Código:"). Evita capturar palavras soltas tipo
