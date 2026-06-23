@@ -303,6 +303,9 @@ export interface ListFilter {
   search?: string;
   /** Se true, retorna so cupons de alta confianca (verificados hoje / muito usados). */
   trustedOnly?: boolean;
+  /** Se true, inclui tambem os de BAIXA confianca (verificacao antiga/ausente).
+   * Por padrao (false) eles ficam escondidos para limpar a lista. */
+  includeLow?: boolean;
   limit?: number;
 }
 
@@ -361,7 +364,10 @@ export function listCoupons(filter: ListFilter = {}): Coupon[] {
   );
   if (filter.store) items = items.filter((c) => c.store === filter.store);
   if (filter.status) items = items.filter((c) => c.status === filter.status);
+  // Confianca: "so confiaveis" = alta; padrao = alta+media (esconde baixa);
+  // includeLow = mostra tambem as de baixa confianca (verificacao antiga/ausente).
   if (filter.trustedOnly) items = items.filter((c) => c.confidence === "high");
+  else if (!filter.includeLow) items = items.filter((c) => c.confidence !== "low");
   if (filter.search) {
     const q = filter.search.toLowerCase();
     items = items.filter(

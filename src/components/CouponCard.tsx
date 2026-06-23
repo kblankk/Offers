@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, ArrowUpRight, ShieldCheck, Users, Layers, Sparkles, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Copy, Check, ArrowUpRight, ShieldCheck, Users, Layers, Sparkles, ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
 import { StoreLogo } from "./StoreLogo";
 import { STORE_META, storeUrl, type Coupon } from "@/lib/types";
+import { SITE_URL } from "@/lib/site";
 
 const RED = "#c0392b";
 
@@ -41,6 +42,23 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       setTimeout(() => setCopied(false), 1800);
     } catch {
       /* ignore */
+    }
+  }
+
+  function share() {
+    const url = `${SITE_URL}/cupom/${coupon.id}`;
+    const text = `${coupon.discountText ?? "Cupom"} ${meta.label}${
+      coupon.code ? ` — código ${coupon.code}` : ""
+    } no AllCupom`;
+    const nav = navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
+    if (typeof nav.share === "function") {
+      nav.share({ title: "AllCupom", text, url }).catch(() => {});
+    } else {
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(`${text}: ${url}`)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
     }
   }
 
@@ -150,25 +168,43 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
                 <Copy className="h-4 w-4 shrink-0" style={{ color: RED }} />
               )}
             </button>
+            <button
+              onClick={share}
+              title="Compartilhar"
+              className="inline-flex shrink-0 items-center justify-center rounded-[4px] border-[1.5px] border-[#1b1a17]/20 px-2.5 text-[#1b1a17] transition hover:border-[#1b1a17]/50 hover:bg-[#1b1a17]/5"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
+            {/* clicar = copia o código E abre a loja num passo só */}
             <a
               href={storeUrl(coupon)}
               target="_blank"
               rel="noopener noreferrer"
-              title={coupon.exclusive ? "Ativar cupom" : "Ir à loja"}
-              className="inline-flex shrink-0 items-center justify-center rounded-[4px] bg-[#1b1a17] px-3.5 text-[#f7f3ea] transition hover:bg-black"
+              onClick={copyCode}
+              title="Copiar e abrir a loja"
+              className="inline-flex shrink-0 items-center justify-center gap-1 rounded-[4px] bg-[#1b1a17] px-3 text-[11px] font-bold uppercase tracking-wide text-[#f7f3ea] transition hover:bg-black"
             >
-              <ArrowUpRight className="h-5 w-5" />
+              Abrir <ArrowUpRight className="h-4 w-4" />
             </a>
           </div>
         ) : (
-          <a
-            href={storeUrl(coupon)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 rounded-[4px] bg-[#1b1a17] px-3 py-2.5 font-mono text-sm font-bold uppercase tracking-wider text-[#f7f3ea] transition hover:bg-black"
-          >
-            Ativar desconto <ArrowUpRight className="h-4 w-4" />
-          </a>
+          <div className="flex items-stretch gap-2">
+            <a
+              href={storeUrl(coupon)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-[4px] bg-[#1b1a17] px-3 py-2.5 font-mono text-sm font-bold uppercase tracking-wider text-[#f7f3ea] transition hover:bg-black"
+            >
+              Ativar desconto <ArrowUpRight className="h-4 w-4" />
+            </a>
+            <button
+              onClick={share}
+              title="Compartilhar"
+              className="inline-flex shrink-0 items-center justify-center rounded-[4px] border-[1.5px] border-[#1b1a17]/20 px-2.5 text-[#1b1a17] transition hover:border-[#1b1a17]/50 hover:bg-[#1b1a17]/5"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
+          </div>
         )}
 
         {!isExpired && (

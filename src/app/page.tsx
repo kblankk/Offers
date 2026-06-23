@@ -22,6 +22,7 @@ interface ApiResponse {
   coupons: Coupon[];
   stats: Record<string, number>;
   updatedAt: string | null;
+  lowHidden?: number;
 }
 
 function timeAgo(iso: string | null): string {
@@ -57,7 +58,9 @@ export default function Home() {
   const [collecting, setCollecting] = useState(false);
   const [store, setStore] = useState<StoreFilter>("all");
   const [status, setStatus] = useState<StatusFilter>("active");
-  const [trusted, setTrusted] = useState(true);
+  const [trusted, setTrusted] = useState(false);
+  const [showLow, setShowLow] = useState(false);
+  const [lowHidden, setLowHidden] = useState(0);
   const [query, setQuery] = useState("");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -66,6 +69,7 @@ export default function Home() {
     if (store !== "all") params.set("store", store);
     if (status !== "all") params.set("status", status);
     if (trusted) params.set("trusted", "1");
+    if (showLow) params.set("all", "1");
     if (query.trim()) params.set("q", query.trim());
     try {
       const res = await fetch(`/api/coupons?${params.toString()}`);
@@ -73,10 +77,11 @@ export default function Home() {
       setCoupons(data.coupons ?? []);
       setStats(data.stats ?? {});
       setUpdatedAt(data.updatedAt ?? null);
+      setLowHidden(data.lowHidden ?? 0);
     } finally {
       setLoading(false);
     }
-  }, [store, status, query, trusted]);
+  }, [store, status, query, trusted, showLow]);
 
   const fetchHighlights = useCallback(async () => {
     try {
@@ -363,6 +368,21 @@ export default function Home() {
                   <CouponCard coupon={c} />
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Cupons de baixa confianca (verificacao antiga/ausente) ficam ocultos
+              por padrao; o usuario pode revelar. So aparece fora do "So confiaveis". */}
+          {!trusted && (lowHidden > 0 || showLow) && (
+            <div className="mt-8 text-center">
+              <button
+                onClick={() => setShowLow((v) => !v)}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-[#5b574e] ring-1 ring-[#1b1a17]/15 transition hover:bg-[#1b1a17]/5 dark:text-zinc-300 dark:ring-white/15 dark:hover:bg-white/5"
+              >
+                {showLow
+                  ? "Ocultar cupons menos confiáveis"
+                  : `Ver também ${lowHidden} cupons menos confiáveis (verificação antiga)`}
+              </button>
             </div>
           )}
         </div>

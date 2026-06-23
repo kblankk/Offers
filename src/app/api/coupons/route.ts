@@ -14,12 +14,18 @@ export async function GET(req: Request) {
   const statusParam = searchParams.get("status");
   const search = searchParams.get("q") ?? undefined;
   const trustedOnly = searchParams.get("trusted") === "1";
+  const includeLow = searchParams.get("all") === "1";
 
   const store = VALID_STORES.includes(storeParam as Store) ? (storeParam as Store) : undefined;
   const status = VALID_STATUS.includes(statusParam as CouponStatus)
     ? (statusParam as CouponStatus)
     : undefined;
 
-  const coupons = listCoupons({ store, status, search, trustedOnly });
-  return NextResponse.json({ coupons, stats: stats(), updatedAt: lastUpdatedAt() });
+  const coupons = listCoupons({ store, status, search, trustedOnly, includeLow });
+  // Quantos de baixa confianca estao escondidos (para o link "ver menos confiaveis").
+  const lowHidden =
+    trustedOnly || includeLow
+      ? 0
+      : listCoupons({ store, status, search, includeLow: true }).filter((c) => c.confidence === "low").length;
+  return NextResponse.json({ coupons, stats: stats(), updatedAt: lastUpdatedAt(), lowHidden });
 }
