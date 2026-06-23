@@ -74,6 +74,9 @@ export interface Coupon extends RawCoupon {
   failed?: number;
   /** Data (YYYY-MM-DD) dos relatos worked/failed (resetam por dia). */
   votedDate?: string;
+  /** Relatos ACUMULADOS (nunca resetam) — base da taxa de sucesso exibida. */
+  workedAll?: number;
+  failedAll?: number;
 }
 
 /** Resultado de uma verificacao individual. */

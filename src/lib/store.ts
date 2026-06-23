@@ -381,6 +381,18 @@ export function listCoupons(filter: ListFilter = {}): Coupon[] {
   const statusRank = (c: Coupon) =>
     c.status === "active" ? 0 : c.status === "suspected_exhausted" ? 1 : c.status === "unknown" ? 2 : 3;
   const confRank = (c: Coupon) => (c.confidence === "high" ? 0 : c.confidence === "medium" ? 1 : 2);
+  // Sinal da COMUNIDADE (acumulado): com >=3 votos, os que mais funcionam sobem e
+  // os que mais falham descem. Com poucos votos fica neutro (nao interfere).
+  const voteTier = (c: Coupon) => {
+    const w = c.workedAll ?? 0,
+      f = c.failedAll ?? 0,
+      t = w + f;
+    if (t < 3) return 0;
+    const rate = w / t;
+    if (rate >= 0.6) return -1;
+    if (rate < 0.4) return 1;
+    return 0;
+  };
   // "Recem-postado": cupom com postedAt (Telegram) nas ultimas 3h. Esse tempo e
   // REAL (nao reseta no deploy), entao da pra colocar o que acabou de sair no topo.
   const FRESH_MS = 3 * 60 * 60 * 1000;
@@ -397,7 +409,9 @@ export function listCoupons(filter: ListFilter = {}): Coupon[] {
     const fa = isFresh(a), fb = isFresh(b);
     if (fa !== fb) return fa ? -1 : 1;
     if (fa && fb) return postedMs(b) - postedMs(a);
-    // 3) confianca; 4) mais usados hoje; 5) descoberto/visto mais recente.
+    // 3) taxa de sucesso da comunidade (quem funciona sobe, quem falha desce);
+    if (voteTier(a) !== voteTier(b)) return voteTier(a) - voteTier(b);
+    // 4) confianca; 5) mais usados hoje; 6) descoberto/visto mais recente.
     if (confRank(a) !== confRank(b)) return confRank(a) - confRank(b);
     if ((b.usesToday ?? 0) !== (a.usesToday ?? 0)) return (b.usesToday ?? 0) - (a.usesToday ?? 0);
     if (a.firstSeenAt !== b.firstSeenAt) return b.firstSeenAt.localeCompare(a.firstSeenAt);
@@ -435,7 +449,10 @@ export function isStale(maxAgeMs: number): boolean {
  * resetam por dia. Quando os negativos passam de um limiar, o cupom some da
  * lista (esgotado pela comunidade) — ver communityExhausted/listCoupons.
  */
-export function recordFeedback(id: string, ok: boolean): { worked: number; failed: number } | null {
+export function recordFeedback(
+  id: string,
+  ok: boolean,
+): { worked: number; failed: number; workedAll: number; failedAll: number } | null {
   reloadIfChanged();
   const c = data.get(id);
   if (!c) return null;
@@ -443,11 +460,14 @@ export function recordFeedback(id: string, ok: boolean): { worked: number; faile
   const sameDay = c.votedDate === today;
   let worked = sameDay ? c.worked ?? 0 : 0;
   let failed = sameDay ? c.failed ?? 0 : 0;
+  // Acumulados nunca resetam (base da taxa de sucesso exibida no card).
+  const workedAll = (c.workedAll ?? 0) + (ok ? 1 : 0);
+  const failedAll = (c.failedAll ?? 0) + (ok ? 0 : 1);
   if (ok) worked++;
   else failed++;
-  data.set(id, { ...c, worked, failed, votedDate: today });
+  data.set(id, { ...c, worked, failed, votedDate: today, workedAll, failedAll });
   persist();
-  return { worked, failed };
+  return { worked, failed, workedAll, failedAll };
 }
 
 export function stats(): Record<string, number> {

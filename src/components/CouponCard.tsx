@@ -14,6 +14,8 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
   const [copied, setCopied] = useState(false);
   const [vote, setVote] = useState<null | "ok" | "fail">(null);
   const [reports, setReports] = useState({ worked: coupon.worked ?? 0, failed: coupon.failed ?? 0 });
+  // Acumulado (nao reseta por dia) — base da taxa de sucesso exibida.
+  const [rate, setRate] = useState({ worked: coupon.workedAll ?? 0, failed: coupon.failedAll ?? 0 });
   const meta = STORE_META[coupon.store];
   const isExpired = coupon.status === "expired";
 
@@ -21,6 +23,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
     if (vote) return;
     setVote(ok ? "ok" : "fail");
     setReports((r) => ({ worked: r.worked + (ok ? 1 : 0), failed: r.failed + (ok ? 0 : 1) }));
+    setRate((r) => ({ worked: r.worked + (ok ? 1 : 0), failed: r.failed + (ok ? 0 : 1) }));
     try {
       const res = await fetch("/api/feedback", {
         method: "POST",
@@ -29,6 +32,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       });
       const data = await res.json();
       if (res.ok && typeof data.worked === "number") setReports({ worked: data.worked, failed: data.failed });
+      if (res.ok && typeof data.workedAll === "number") setRate({ worked: data.workedAll, failed: data.failedAll });
     } catch {
       /* mantem o otimista */
     }
@@ -67,6 +71,18 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
     : coupon.usesToday
       ? { Icon: Users, text: `${coupon.usesToday.toLocaleString("pt-BR")} usaram hoje`, cls: "text-[#8a857a]" }
       : null;
+
+  // Taxa de sucesso da comunidade (acumulada). So mostra com votos suficientes.
+  const totalVotes = rate.worked + rate.failed;
+  const successPct = totalVotes >= 3 ? Math.round((rate.worked / totalVotes) * 100) : null;
+  const rateCls =
+    successPct === null
+      ? ""
+      : successPct >= 70
+        ? "text-emerald-700"
+        : successPct >= 40
+          ? "text-amber-600"
+          : "text-rose-600";
 
   // "Novo" = postado na fonte (Telegram) nas ultimas 6h. Usa o tempo REAL do
   // post (nao o firstSeenAt, que reseta a cada deploy do servidor).
@@ -129,6 +145,15 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
         <p className="mt-3 line-clamp-1 text-sm text-[#5b574e]">{title}</p>
 
         <div className="mt-3 space-y-1.5 font-mono text-[11px]">
+          {successPct !== null && (
+            <p className={`flex items-center gap-1.5 font-semibold ${rateCls}`}>
+              <ThumbsUp className="h-3.5 w-3.5 shrink-0" />
+              <span className="normal-case">{successPct}% funcionou</span>
+              <span className="font-normal text-[#8a857a]">
+                · {totalVotes} {totalVotes === 1 ? "voto" : "votos"}
+              </span>
+            </p>
+          )}
           {coupon.scope && (
             <p className="flex items-center gap-1.5 text-[#8a857a]">
               <Layers className="h-3.5 w-3.5 shrink-0" />
