@@ -91,7 +91,15 @@ export function FeaturedCoupon({ coupon }: { coupon: Coupon }) {
 
         <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] uppercase tracking-wider text-[#8a857a]">
           {typeof coupon.minPurchase === "number" && <span>mín · R${coupon.minPurchase}</span>}
-          {typeof coupon.minPurchase === "number" && coupon.scope && <span style={{ color: RED }}>·</span>}
+          {typeof coupon.maxDiscount === "number" && (
+            <>
+              <span style={{ color: RED }}>·</span>
+              <span>limite R${coupon.maxDiscount}</span>
+            </>
+          )}
+          {(typeof coupon.minPurchase === "number" || typeof coupon.maxDiscount === "number") && coupon.scope && (
+            <span style={{ color: RED }}>·</span>
+          )}
           {coupon.scope && <span className="normal-case tracking-normal">{coupon.scope}</span>}
         </div>
       </div>

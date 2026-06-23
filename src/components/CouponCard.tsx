@@ -98,9 +98,13 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
           {coupon.discountText ?? "Oferta"}
         </p>
         <div className="mt-2 flex items-center gap-2">
-          <span className="h-[3px] w-9" style={{ background: RED }} />
-          {typeof coupon.minPurchase === "number" && (
-            <span className="font-mono text-[10px] uppercase tracking-wide text-[#8a857a]">mín R${coupon.minPurchase}</span>
+          <span className="h-[3px] w-9 shrink-0" style={{ background: RED }} />
+          {(typeof coupon.minPurchase === "number" || typeof coupon.maxDiscount === "number") && (
+            <span className="font-mono text-[10px] uppercase tracking-wide text-[#8a857a]">
+              {typeof coupon.minPurchase === "number" ? `mín R$${coupon.minPurchase}` : ""}
+              {typeof coupon.minPurchase === "number" && typeof coupon.maxDiscount === "number" ? " · " : ""}
+              {typeof coupon.maxDiscount === "number" ? `limite R$${coupon.maxDiscount}` : ""}
+            </span>
           )}
         </div>
 

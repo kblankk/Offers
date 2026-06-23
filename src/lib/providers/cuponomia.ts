@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import type { RawCoupon, Store } from "../types";
-import { parseMinPurchase, parseScope } from "../parse";
+import { parseMaxDiscount, parseMinPurchase, parseScope } from "../parse";
 import type { ProviderContext } from "./provider";
 
 /**
@@ -93,6 +93,7 @@ export async function collectFromCuponomia(
       usesToday: parseUses(status),
       exclusive,
       minPurchase: parseMinPurchase(`${desc} ${title}`),
+      maxDiscount: parseMaxDiscount(`${desc} ${title}`),
       scope,
       scopeGeneral: general,
       expiresAt: null,

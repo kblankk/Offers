@@ -20,6 +20,20 @@ export function parseMinPurchase(text: string): number | undefined {
   return Number.isFinite(n) && n > 0 ? n : undefined;
 }
 
+/**
+ * Teto do desconto em R$ ("limitado a R$100", "limite de R$50", "máximo de
+ * R$80", "até R$40"). É o quanto, no máximo, o cupom abate — info que a fonte
+ * costuma esconder no fim da descrição.
+ */
+export function parseMaxDiscount(text: string): number | undefined {
+  const m = text.match(
+    /(?:limitad[oa]\s*(?:a|em|de|ao valor de)?|limite de|m[aá]ximo de|at[eé])\s*R\$\s*([\d.]+)/i,
+  );
+  if (!m) return undefined;
+  const n = Number(m[1]!.replace(/\./g, ""));
+  return Number.isFinite(n) && n > 0 ? n : undefined;
+}
+
 /** Desconto legivel a partir do texto (%, R$ OFF ou preco). */
 export function parseDiscountText(text: string): string | undefined {
   const pct = text.match(/(\d{1,3})\s*%\s*(?:de\s*)?(?:off|desconto)?/i);

@@ -40,6 +40,8 @@ export interface RawCoupon {
   exclusive?: boolean;
   /** Valor minimo de compra para o cupom valer (R$), quando detectado. */
   minPurchase?: number;
+  /** Teto do desconto em R$ ("limitado a R$X"), quando detectado. */
+  maxDiscount?: number;
   /** Onde o cupom vale (ex.: "Site todo", "Moda", "Produtos internacionais · 1ª compra"). */
   scope?: string;
   /** true se vale no site inteiro (geral); false se restrito a categoria/itens. */

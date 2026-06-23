@@ -1,5 +1,5 @@
 import type { RawCoupon, Store } from "../types";
-import { normalizeText, parseDiscountText, parseMinPurchase, parseScope, PRODUCT_NOUNS } from "../parse";
+import { normalizeText, parseDiscountText, parseMaxDiscount, parseMinPurchase, parseScope, PRODUCT_NOUNS } from "../parse";
 import type { ProviderContext } from "./provider";
 
 /**
@@ -177,6 +177,7 @@ async function fetchChannel(channel: string, ctx: ProviderContext): Promise<RawC
       url: extractUrl(text) ?? url,
       discountText: discount,
       minPurchase: parseMinPurchase(text),
+      maxDiscount: parseMaxDiscount(text),
       scope,
       scopeGeneral: general,
       source: `telegram:${channel}`,
